@@ -1,6 +1,6 @@
 	program prog
 	implicit none
-	integer :: i
+	integer :: i, ierror
 	real :: x
 	real, dimension(2) :: largest, current
 	real :: f
@@ -12,18 +12,22 @@
 
 	do while (.true.)
 		do i = 1, 3
-			write(*,'(A)',advance='no') names(i) // ' = '
-			read(*,*) abn(i)
+			write(*,'(A)',advance='no') '# ' // names(i) // ' = '
+			read(*,*,iostat=ierror) abn(i)
 		end do
 		if (abn(1) >= abn(2)) then
-			write(*,*) 'The ranges are invalid, please retry.'
+			write(*,*) '# The ranges are invalid, please retry.'
+			cycle
+		else if (abn(3) <= 1) then
+			write(*,*) '# There must be more than one step.'
 			cycle
 		end if
 		exit
 	end do
+	! End 2:1
 
 	! Part 2: 2)
-	step = (abn(2) - abn(1)) / abn(3)
+	step = (abn(2) - abn(1)) / (abn(3)-1)
 	x = abn(1)
 	largest = (/ abn(1), f(abn(1)) /)
 
@@ -33,7 +37,10 @@
 		write(*,*) current
 		x = x + step
 	end do
-	write(*,*) 'Largest: ', largest
+
+	! Part 2: 4)
+	write(*,*) '# Largest: ', largest
+	! End 2:2
 
 	end program prog
 
@@ -45,3 +52,4 @@
 		real, parameter :: pi = 4.0*atan(1.0)
 		f = x**2*sin(pi*x)
 	end
+	! End 2:2
