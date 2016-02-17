@@ -1,13 +1,15 @@
 program navier
 implicit none
-real :: n = 500, Re = 100, tmax = 10, dt = 0.01
+real :: n = 30, Re = 100, tmax = 10, dt = 0.01
 real :: itmax = 300, h, beta, ideal
-real :: desired
+real :: desired, t
+integer :: i, j
 real :: epsi = 1e-6
 real, dimension(1:9) :: nn = [0, 5, 10, 20, 30, 40, 60, 100, 500]
 real, dimension(1:9) :: cc = [1.7, 1.78, 1.86, 1.92, 1.95, 1.96, 1.97, 1.98, 1.99]
 real :: omega
 real, allocatable :: u(:,:), v(:,:), p(:,:)
+real :: fux, fuy, fvx, fvy, visu, visv
 omega = interp1(nn, cc, n, 9)
 h = 1/n
 beta = omega*h**2/(4*dt)
@@ -21,6 +23,27 @@ if (dt > ideal ) then
 write(*,*) 'Warning! dt should be less than ', ideal
 read(*,*)
 endif
+
+t = 0.0
+do while (t < tmax)
+i = 2
+do while (i < n+1)
+i = i + 1
+j = 2
+do while (j < n+1)
+fux=((u(i,j)+u(i+1,j))**2-(u(i-1,j)+u(i,j))**2)*0.25/h
+fuy=((v(i,j)+v(i+1,j))*(u(i,j)+u(i,j+1))-(v(i,j-1)+v(i+1,j-1))*(u(i,j-1)+u(i,j)))*0.25/h
+fvx=((u(i,j)+u(i,j+1))*(v(i,j)+v(i+1,j))-(u(i-1,j)+u(i-1,j+1))*(v(i-1,j)+v(i,j)))*0.25/h
+fvy=((v(i,j)+v(i,j+1))**2-(v(i,j-1)+v(i,j))**2)*0.25/h
+visu=(u(i+1,j)+u(i-1,j)+u(i,j+1)+u(i,j-1)-4.0*u(i,j))/(Re*h**2)
+visv=(v(i+1,j)+v(i-1,j)+v(i,j+1)+v(i,j-1)-4.0*v(i,j))/(Re*h**2)
+u(i,j)=u(i,j)+dt*((p(i,j)-p(i+1,j))/h-fux-fuy+visu)
+v(i,j)=v(i,j)+dt*((p(i,j)-p(i,j+1))/h-fvx-fvy+visv)
+j = j + 1
+enddo
+enddo
+t = t + dt
+enddo
 
 contains
 
