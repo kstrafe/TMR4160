@@ -18,8 +18,6 @@ program navier
 	v = u
 	p = u
 
-
-	write(*,*) h, Re*h**2/4, 2/Re
 	ideal = min(h, Re*h**2/4, 2/Re)
 	if (dt > ideal ) then
 		write(*,*) 'Warning! dt should be less than ', ideal
@@ -33,6 +31,10 @@ program navier
 			j = 2
 			do while (j < n+1)
 				fux=((u(i,j)+u(i+1,j))**2-(u(i-1,j)+u(i,j))**2)*0.25/h
+				if (fux /= fux) then
+					print *, fux, i, j
+					stop 2
+				endif
 				fuy=((v(i,j)+v(i+1,j))*(u(i,j)+u(i,j+1))-(v(i,j-1)+v(i+1,j-1))*(u(i,j-1)+u(i,j)))*0.25/h
 				fvx=((u(i,j)+u(i,j+1))*(v(i,j)+v(i+1,j))-(u(i-1,j)+u(i-1,j+1))*(v(i-1,j)+v(i,j)))*0.25/h
 				fvy=((v(i,j)+v(i,j+1))**2-(v(i,j-1)+v(i,j))**2)*0.25/h
@@ -61,7 +63,7 @@ program navier
 
 			do j = 2, n+1
 				do i = 2, n+1
-					div = (u(i,j)-u(i-1,j))/h+(v(i,j)-v(i,j)-1)/h
+					div = (u(i,j)-u(i-1,j))/h+(v(i,j)-v(i,j-1))/h
 					if (abs(div) >= epsi) then
 						iflag = 1
 					endif
