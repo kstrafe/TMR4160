@@ -1,16 +1,16 @@
 program navier
 	implicit none
-	real :: Re = 100, tmax = 10, dt = 0.01
-	real :: h, beta, ideal
-	real :: desired, t, div, delp
+	real(8) :: Re = 100, tmax = 10, dt = 0.01
+	real(8) :: h, beta, ideal
+	real(8) :: desired, t, div, delp
 	integer :: i, j, iter, itmax = 300, n = 30, iflag = 0
-	real :: epsi = 1e-6
-	real, dimension(1:9) :: nn = [0, 5, 10, 20, 30, 40, 60, 100, 500]
-	real, dimension(1:9) :: cc = [1.7, 1.78, 1.86, 1.92, 1.95, 1.96, 1.97, 1.98, 1.99]
-	real :: omega
-	real, allocatable :: u(:,:), v(:,:), p(:,:)
-	real :: fux, fuy, fvx, fvy, visu, visv
-	omega = interp1(nn, cc, real(n), 9)
+	real(8) :: epsi = 1e-6
+	real(8), dimension(1:9) :: nn = [0, 5, 10, 20, 30, 40, 60, 100, 500]
+	real(8), dimension(1:9) :: cc = [1.7, 1.78, 1.86, 1.92, 1.95, 1.96, 1.97, 1.98, 1.99]
+	real(8) :: omega
+	real(8), allocatable :: u(:,:), v(:,:), p(:,:)
+	real(8) :: fux, fuy, fvx, fvy, visu, visv
+	omega = interp1(nn, cc, dble(n), 9)
 	h = 1/real(n)
 	beta = omega*h**2/(4*dt)
 	allocate(u(n+2,n+2))
@@ -29,7 +29,6 @@ program navier
 	do while (t < tmax)
 		i = 2
 		do while (i < n+1)
-			i = i + 1
 			j = 2
 			do while (j < n+1)
 				fux=((u(i,j)+u(i+1,j))**2-(u(i-1,j)+u(i,j))**2)*0.25/h
@@ -42,6 +41,7 @@ program navier
 				v(i,j)=v(i,j)+dt*((p(i,j)-p(i,j+1))/h-fvx-fvy+visv)
 				j = j + 1
 			enddo
+			i = i + 1
 		enddo
 		do iter = 1, itmax
 			do j = 1, n+2
@@ -90,11 +90,11 @@ contains
 		! Let x be a monotonically increasing array
 		! Val is the value to find the closest index to
 		implicit none
-		real, dimension(:), intent(in) :: array
+		real(8), dimension(:), intent(in) :: array
 		integer, intent(in) :: arsize
 		integer :: i
-		real, intent(in) :: desired
-		real :: min_distance, distance
+		real(8), intent(in) :: desired
+		real(8) :: min_distance, distance
 
 		closestIndex = 1
 		if (arsize <= 0) then
@@ -113,11 +113,11 @@ contains
 	end
 
 	integer function nextClosestIndex(array, arsize, closest, desired)
-		real, dimension(:), intent(in) :: array
+		real(8), dimension(:), intent(in) :: array
 		integer, intent(in) :: arsize
 		integer, intent(in) :: closest
-		real, intent(in) :: desired
-		real :: next_closest
+		real(8), intent(in) :: desired
+		real(8) :: next_closest
 		! Assume arrays are 1-indexed
 		if (arsize <= 1) then
 		nextClosestIndex = -1
@@ -139,12 +139,12 @@ contains
 		endif
 	end
 
-	real function interp1(x, y, z, arsize)
+	real(8) function interp1(x, y, z, arsize)
 		! Default: linear interpolation
 		implicit none
-		real, dimension(:), intent(in) :: x, y
-		real, intent(in) :: z
-		real xdiff, ydiff, zdiff
+		real(8), dimension(:), intent(in) :: x, y
+		real(8), intent(in) :: z
+		real(8) :: xdiff, ydiff, zdiff
 		integer, intent(in) :: arsize
 		integer :: closest, next_closest, mini, maxi
 
