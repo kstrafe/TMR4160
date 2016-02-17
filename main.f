@@ -25,7 +25,7 @@ program navier
 	endif
 
 	t = 0.0
-	do while (t < tmax)
+	do while (t <= tmax)
 		i = 2
 		do while (i <= n+1)
 			j = 2
