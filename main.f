@@ -27,9 +27,9 @@ program navier
 	t = 0.0
 	do while (t < tmax)
 		i = 2
-		do while (i < n+1)
+		do while (i <= n+1)
 			j = 2
-			do while (j < n+1)
+			do while (j <= n+1)
 				fux=((u(i,j)+u(i+1,j))**2-(u(i-1,j)+u(i,j))**2)*0.25/h
 				if (fux /= fux) then
 					print *, fux, i, j
@@ -46,6 +46,13 @@ program navier
 			enddo
 			i = i + 1
 		enddo
+
+		!if (t > 0.0) then
+			!print *, u
+			!print *, 'v=', v
+			!stop
+		!endif
+
 		do iter = 1, itmax
 			do j = 1, n+2
 				v(1,j) = 0.0
@@ -79,6 +86,7 @@ program navier
 				exit
 			endif
 		enddo
+		print *, 'div = ', div
 		if (iter >= itmax) then
 			 print *, 'Warning! Time t= ', t, ' iter= ', iter,' div= ', div
 		else
