@@ -55,7 +55,7 @@ program navier
 
 		do iter = 1, itmax
 			do j = 1, n+2
-				v(1,j) = 0.0
+				u(1,j) = 0.0
 				v(1,j) = -v(2,j)
 				u(n+1,j) = 0.0
 				v(n+2,j) = -v(n+1,j)
@@ -86,7 +86,7 @@ program navier
 				exit
 			endif
 		enddo
-		print *, 'div = ', div
+		!print *, 'div = ', div
 		if (iter >= itmax) then
 			 print *, 'Warning! Time t= ', t, ' iter= ', iter,' div= ', div
 		else
