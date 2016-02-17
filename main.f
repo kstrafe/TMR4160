@@ -1,19 +1,26 @@
 program navier
 implicit none
-real :: n = 30
+real :: n = 500, Re = 100, tmax = 10, dt = 0.01
+real :: itmax = 300, h, beta, ideal
+real :: desired
 real :: epsi = 1e-6
 real, dimension(1:9) :: nn = [0, 5, 10, 20, 30, 40, 60, 100, 500]
 real, dimension(1:9) :: cc = [1.7, 1.78, 1.86, 1.92, 1.95, 1.96, 1.97, 1.98, 1.99]
-real :: omega = 1.950
-write(*,*) n
-write(*,*) epsi
-write(*,*) nn
-write(*,*) cc
-write(*,*) 'Clean Up'
+real :: omega
+real, allocatable :: u(:,:), v(:,:), p(:,:)
+omega = interp1(nn, cc, n, 9)
+h = 1/n
+beta = omega*h**2/(4*dt)
+allocate(u(int(n+2),int(n+2)))
+u = 0
+v = u
+p = u
 
-write(*,*) closestIndex(nn, 9, 30.0)
-write(*,*) nextClosestIndex(nn, 9, 5, 30.0)
-write(*,*) interp1(nn, cc, 30.0, 9)
+ideal = min(h, Re*h**2/4, 2/Re)
+if (dt > ideal ) then
+write(*,*) 'Warning! dt should be less than ', ideal
+read(*,*)
+endif
 
 contains
 
@@ -88,12 +95,6 @@ xdiff = x(maxi) - x(mini)
 ydiff = (y(maxi) - y(mini)) / xdiff
 zdiff = z - x(mini)
 ! We create a line segment and add the gradient
-write(*,*) x(mini)
-write(*,*) x(maxi)
-write(*,*) y(mini)
-write(*,*) y(maxi)
-write(*,*) ydiff
-write(*,*) zdiff
 interp1 = y(mini) + zdiff * ydiff
 return
 end
