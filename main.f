@@ -2,11 +2,11 @@ program navier
 	implicit none
 	real(8) :: Re = 100, tmax = 10, dt = 0.01
 	real(8) :: h, beta, ideal
-	real(8) :: desired, t, div, delp
+	real(8) :: t, div, delp
 	integer :: i, j, iter, itmax = 300, n = 30, iflag = 0
 	real(8) :: epsi = 1e-6
-	real(8), dimension(1:9) :: nn = [0, 5, 10, 20, 30, 40, 60, 100, 500]
-	real(8), dimension(1:9) :: cc = [1.7, 1.78, 1.86, 1.92, 1.95, 1.96, 1.97, 1.98, 1.99]
+	real(8), dimension(9) :: nn = [0, 5, 10, 20, 30, 40, 60, 100, 500]
+	real(8), dimension(9) :: cc = [1.7, 1.78, 1.86, 1.92, 1.95, 1.96, 1.97, 1.98, 1.99]
 	real(8) :: omega
 	real(8), allocatable :: u(:,:), v(:,:), p(:,:)
 	real(8) :: fux, fuy, fvx, fvy, visu, visv
@@ -18,11 +18,12 @@ program navier
 	v = u
 	p = u
 
+
 	write(*,*) h, Re*h**2/4, 2/Re
 	ideal = min(h, Re*h**2/4, 2/Re)
 	if (dt > ideal ) then
-	write(*,*) 'Warning! dt should be less than ', ideal
-	read(*,*)
+		write(*,*) 'Warning! dt should be less than ', ideal
+		read(*,*)
 	endif
 
 	t = 0.0
@@ -77,7 +78,7 @@ program navier
 			endif
 		enddo
 		if (iter >= itmax) then
-			 write(*,*) 'Warning! Time t= ', t, ' iter= ', iter,' div= ', div
+			 print *, 'Warning! Time t= ', t, ' iter= ', iter,' div= ', div
 		else
 				write(*,*) 'Time t= ', t, ' iter= ', iter
 		endif

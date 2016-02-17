@@ -51,6 +51,7 @@ for t=0:dt:tmax                % Main loop
         for j=2:n+1
             for i=2:n+1
                 div=(u(i,j)-u(i-1,j))/h+(v(i,j)-v(i,j-1))/h;
+								div
                 if (abs(div)>=epsi),iflag=1;end
                 delp=-beta*div;
                 p(i,j)  =p(i,j)  +delp;
