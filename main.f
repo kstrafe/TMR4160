@@ -19,7 +19,7 @@ program navier
 	p = u
 
 	ideal = min(h, Re*h**2/4, 2/Re)
-	if (dt > ideal ) then
+	if (dt > ideal) then
 		write(*,*) 'Warning! dt should be less than ', ideal
 		read(*,*)
 	endif
@@ -94,6 +94,8 @@ program navier
 		endif
 		t = t + dt
 	enddo
+
+	!print *, v
 
 contains
 

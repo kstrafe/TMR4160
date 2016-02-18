@@ -1,20 +1,13 @@
 % SOLA - MATLAB
 
-clear all
-close all
+clear all; close all;
 clc
-n=30;
-epsi=1e-6;
-nn=[0   5    10   20   30   40   60   100  500];
-oo=[1.7 1.78 1.86 1.92 1.95 1.96 1.97 1.98 1.99];
-omega=interp1(nn,oo,n);               % Interpolating a reasonable value
-Re=100;
-tmax=10;
-dt=0.01;
-itmax=300;
-h=1/n;
-beta=omega*h^2/(4*dt);
-u=zeros(n+2,n+2);v=u;p=u;
+n = 30; epsi = 1e-6;
+nn = [0   5    10   20   30   40   60   100  500];
+oo = [1.7 1.78 1.86 1.92 1.95 1.96 1.97 1.98 1.99];
+omega = interp1(nn,oo,n); Re = 100; tmax = 10; dt = 0.01;
+itmax = 300; h = 1/n; beta = omega*h^2/(4*dt);
+u = zeros(n+2,n+2); v = u; p = u;
 
 if dt>min([h,Re*h^2/4,2/Re])
     disp(['Warning! dt should be less than ',num2str(min([h,Re*h^2/4,2/Re]))])
@@ -34,6 +27,11 @@ for t=0:dt:tmax                % Main loop
             v(i,j)=v(i,j)+dt*((p(i,j)-p(i,j+1))/h-fvx-fvy+visv);
         end
     end
+		%if t > 0
+			%u
+			%v
+			%return
+		%end
     for iter=1:itmax           % BcVel, Boundary conditions for the velocities
         for j=1:n+2
             u(1,j)=0.0;
@@ -51,7 +49,6 @@ for t=0:dt:tmax                % Main loop
         for j=2:n+1
             for i=2:n+1
                 div=(u(i,j)-u(i-1,j))/h+(v(i,j)-v(i,j-1))/h;
-								div
                 if (abs(div)>=epsi),iflag=1;end
                 delp=-beta*div;
                 p(i,j)  =p(i,j)  +delp;
@@ -66,10 +63,12 @@ for t=0:dt:tmax                % Main loop
     if iter>=itmax
        disp(['Warning! Time t= ',num2str(t),' iter= ',int2str(iter),' div= ',num2str(div)])
     else
-        disp(['Time t= ',num2str(t),' iter= ',int2str(iter)])
+        %disp(['Time t= ',num2str(t),' iter= ',int2str(iter)])
     end
 end
 
+%u
+return
 % Graphic display:
 
 U=zeros(n);
