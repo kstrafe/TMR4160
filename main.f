@@ -31,7 +31,7 @@ program navier
 			j = 2
 			do while (j <= n+1)
 				fux=((u(i,j)+u(i+1,j))**2-(u(i-1,j)+u(i,j))**2)*0.25/h
-				if (fux /= fux) then
+				if (isNan(fux)) then
 					print *, fux, i, j
 					stop 2
 				endif
@@ -171,6 +171,13 @@ contains
 		! We create a line segment and add the gradient
 		interp1 = y(mini) + zdiff * ydiff
 		return
+	end
+
+	logical(4) function isNan(a)
+		! Computes whether or not a value is of the IEEE NaN type
+		implicit none
+		real(8), intent(in) :: a
+		isNan = a /= a
 	end
 
 
