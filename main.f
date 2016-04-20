@@ -4,6 +4,7 @@ program navier
 	real(8) :: h, beta, ideal
 	real(8) :: t, div, delp
 	integer :: i, j, iter, itmax = 300, n = 30, iflag = 0
+	integer :: top, bottom, left, right, height
 	real(8) :: epsi = 1e-6
 	real(8), dimension(9) :: nn = [0, 5, 10, 20, 30, 40, 60, 100, 500]
 	real(8), dimension(9) :: cc = [1.7, 1.78, 1.86, 1.92, 1.95, 1.96, 1.97, 1.98, 1.99]
@@ -16,6 +17,12 @@ program navier
 	if (n == 0) then
 		n = 30
 	endif
+
+	bottom = int((n+2)/4 + (n+2)/8);
+	height = int((n+2)/4);
+	top = bottom + height;
+	left = bottom;
+	right = top;
 
 	omega = interp1(nn, cc, dble(n), 9)
 	h = 1/real(n)
@@ -87,6 +94,21 @@ program navier
 				u(i,n+2) = -u(i,n+1)+2.0
 				u(i,1) = -u(i,2)
 			enddo
+
+
+			do j = bottom, top
+				u(left,j)=0.0;
+				v(left,j)=-v(left+1,j);
+				u(right,j)=0.0;
+				v(right+1,j)=-v(right,j);
+			enddo
+			do i = left, right
+				v(i,top)=0.0;
+				v(i,bottom)=0.0;
+				u(i,top+1)=-u(i,top);
+				u(i,bottom)=-u(i,bottom+1);
+			enddo
+
 			iflag = 0
 
 			do j = 2, n+1
