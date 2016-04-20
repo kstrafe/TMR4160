@@ -10,6 +10,13 @@ program navier
 	real(8) :: omega
 	real(8), allocatable :: u(:,:), v(:,:), p(:,:)
 	real(8) :: fux, fuy, fvx, fvy, visu, visv
+
+	print *, 'Enter n (0 will default to 30): '
+	read(*,*) n
+	if (n == 0) then
+		n = 30
+	endif
+
 	omega = interp1(nn, cc, dble(n), 9)
 	h = 1/real(n)
 	beta = omega*h**2/(4*dt)
@@ -18,7 +25,20 @@ program navier
 	v = u
 	p = u
 
-	ideal = min(h, Re*h**2/4, 2/Re)
+	print *, 'Enter Re (0 will default to 100): '
+	read(*,*) Re
+	if (Re < epsi) then
+		Re = 100
+	endif
+
+	print *, 'Enter dt (0 will default to 0.01): '
+	read(*,*) dt
+	if (dt < epsi) then
+		dt = 0.01
+	endif
+
+	!print *, h, Re*h**2.0/4.0, 2.0/Re
+	ideal = min(h, Re*h**2.0/4.0, 2.0/Re)
 	if (dt > ideal) then
 		write(*,*) 'Warning! dt should be less than ', ideal
 		read(*,*)
@@ -31,10 +51,10 @@ program navier
 			j = 2
 			do while (j <= n+1)
 				fux=((u(i,j)+u(i+1,j))**2-(u(i-1,j)+u(i,j))**2)*0.25/h
-				if (isNan(fux)) then
-					print *, fux, i, j
-					stop 2
-				endif
+				!if (isNan(fux)) then
+					!print *, fux, i, j
+					!stop 2
+				!endif
 				fuy=((v(i,j)+v(i+1,j))*(u(i,j)+u(i,j+1))-(v(i,j-1)+v(i+1,j-1))*(u(i,j-1)+u(i,j)))*0.25/h
 				fvx=((u(i,j)+u(i,j+1))*(v(i,j)+v(i+1,j))-(u(i-1,j)+u(i-1,j+1))*(v(i-1,j)+v(i,j)))*0.25/h
 				fvy=((v(i,j)+v(i,j+1))**2-(v(i,j-1)+v(i,j))**2)*0.25/h
