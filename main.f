@@ -63,6 +63,7 @@ program navier
 			do i = 1, n+2
 				v(i,n+1) = 0.0
 				v(i,1) = 0.0
+				! This is where we set the boundary condition
 				u(i,n+2) = -u(i,n+1)+2.0
 				u(i,1) = -u(i,2)
 			enddo
@@ -95,6 +96,13 @@ program navier
 		t = t + dt
 	enddo
 
+	do i = 1, n+2
+		print *, 'column ', i
+		do j = 1, n+2
+			write(*,*) j, u(j, i), ' '
+		enddo
+		print *, ''
+	enddo
 	!print *, v
 
 contains
@@ -111,17 +119,17 @@ contains
 
 		closestIndex = 1
 		if (arsize <= 0) then
-		closestIndex = -1
-		return
+			closestIndex = -1
+			return
 		end if
 		min_distance = abs(array(1)-desired)
 
 		do i = 2, arsize, 1
-		distance = abs(array(i)-desired)
-		if (distance < min_distance) then
-		min_distance = distance
-		closestIndex = i
-		endif
+			distance = abs(array(i)-desired)
+			if (distance < min_distance) then
+				min_distance = distance
+				closestIndex = i
+			endif
 		end do
 	end
 
@@ -133,22 +141,22 @@ contains
 		real(8) :: next_closest
 		! Assume arrays are 1-indexed
 		if (arsize <= 1) then
-		nextClosestIndex = -1
+			nextClosestIndex = -1
 		endif
 
 		if (closest < arsize) then
-		if (closest == 1) then
-		nextClosestIndex = 2
-		else
-		next_closest = abs(array(closest+1)-desired)
-		if (next_closest < abs(array(closest-1)-desired)) then
-		nextClosestIndex = closest+1
-		else
-		nextClosestIndex = closest-1
+			if (closest == 1) then
+				nextClosestIndex = 2
+			else
+				next_closest = abs(array(closest+1)-desired)
+			if (next_closest < abs(array(closest-1)-desired)) then
+				nextClosestIndex = closest+1
+			else
+				nextClosestIndex = closest-1
+			endif
 		endif
-		endif
 		else
-		nextClosestIndex = closest - 1
+			nextClosestIndex = closest - 1
 		endif
 	end
 
