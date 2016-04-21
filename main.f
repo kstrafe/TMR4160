@@ -82,19 +82,18 @@ program navier
 
 		do iter = 1, itmax
 			do j = 1, n+2
-				u(1,j) = 0.0
+				u(1,j) = 0.1
 				v(1,j) = -v(2,j)
-				u(n+1,j) = 0.0
+				u(n+1,j) = 0.1
 				v(n+2,j) = -v(n+1,j)
 			enddo
 			do i = 1, n+2
 				v(i,n+1) = 0.0
 				v(i,1) = 0.0
 				! This is where we set the boundary condition
-				u(i,n+2) = -u(i,n+1)+2.0
+				u(i,n+2) = -u(i,n+1)
 				u(i,1) = -u(i,2)
 			enddo
-
 
 			do j = bottom, top
 				u(left,j)=0.0;
