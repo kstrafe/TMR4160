@@ -9,7 +9,7 @@ program navier
 	real(8), dimension(9) :: nn = [0, 5, 10, 20, 30, 40, 60, 100, 500]
 	real(8), dimension(9) :: cc = [1.7, 1.78, 1.86, 1.92, 1.95, 1.96, 1.97, 1.98, 1.99]
 	real(8) :: omega
-	real(8), allocatable :: u(:,:), v(:,:), p(:,:)
+	real(8), allocatable :: u(:,:), v(:,:), p(:,:), U_(:,:), V_(:,:), P_(:,:)
 	real(8) :: fux, fuy, fvx, fvy, visu, visv
 
 	print *, 'Enter n (0 will default to 30): '
@@ -145,6 +145,18 @@ program navier
 		print *, ''
 	enddo
 	!print *, v
+
+	allocate(U_(n,n))
+	U_ = 0
+	V_= U_
+	P_ = U_
+	do i = 1, n
+			do j = 1, n
+					print *, real(i)/n, real(j)/n, (u(i,j+1)+u(i+1,j+1))/2, (v(i+1,j)+v(i+1,j+1))/2
+					P_(j,i) = p(i+1,j+1);
+			enddo
+	enddo
+	! axis([0 n+1 0 n+1]);
 
 contains
 
