@@ -5,3 +5,7 @@ all:
 vis:
 	gnuplot speed_plot.gnuplot
 	eog vector_fields1.png
+
+run:
+	$(MAKE) all
+	./a.out

@@ -9,7 +9,7 @@ reset
 # wxt
 # set terminal png size 350,262 enhanced font 'Verdana,10' persist
 # png
-set terminal pngcairo size 350,262 enhanced font 'Verdana,10'
+set terminal pngcairo size 2000,2000 enhanced font 'Verdana,10'
 set output 'vector_fields1.png'
 
 unset key
@@ -25,13 +25,13 @@ set palette defined ( 0 '#ffffff', \
 
 set xrange [0:1]
 set yrange [0:1]
-set cbrange [0:40]
+set cbrange [0:1]
 
 # functions to calculate the arrow offsets
 h = 0.1 # vector size
-xf(phi) = h*cos(phi/180.0*pi+pi/2)
-yf(phi) = h*sin(phi/180.0*pi+pi/2)
+xf(phi) = h*cos(phi/180.0*pi)
+yf(phi) = h*sin(phi/180.0*pi)
 
-plot 'localization_data.txt' \
-	u ($1-xf($3)):($2-yf($3)):(2*xf($3)):(2*yf($3)):4 \
-	with vectors head size 0.1,20,60 filled lc palette
+plot 'output' \
+	u ($1):($2):(xf($3)/3):(yf($3)/3):4 \
+	with vectors head size 0.1,2,60 filled lc palette

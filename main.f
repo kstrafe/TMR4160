@@ -11,6 +11,7 @@ program navier
 	real(8) :: omega
 	real(8), allocatable :: u(:,:), v(:,:), p(:,:), U_(:,:), V_(:,:), P_(:,:)
 	real(8) :: fux, fuy, fvx, fvy, visu, visv
+	real(8) :: max_speed = 0, current_speed = 0
 
 	print *, 'Enter n (0 will default to 30): '
 	read(*,*) n
@@ -147,14 +148,22 @@ program navier
 	!print *, v
 
 	allocate(U_(n,n))
+	do i = 1, n
+		do j = 1, n
+			max_speed = max(sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2), max_speed)
+		enddo
+	enddo
+
 	U_ = 0
 	V_= U_
 	P_ = U_
+	print *, 'START VECTOR FIELD'
 	do i = 1, n
-			do j = 1, n
-					print *, real(i)/n, real(j)/n, (u(i,j+1)+u(i+1,j+1))/2, (v(i+1,j)+v(i+1,j+1))/2
-					P_(j,i) = p(i+1,j+1);
-			enddo
+		do j = 1, n
+			current_speed = sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2) / max_speed
+			print *, real(i)/n, real(j)/n, 180/(355/113)*atan2((v(i+1,j)+v(i+1,j+1))/2, (u(i,j+1)+u(i+1,j+1))/2), current_speed
+			P_(j,i) = p(i+1,j+1);
+		enddo
 	enddo
 	! axis([0 n+1 0 n+1]);
 
