@@ -6,6 +6,10 @@ vis:
 	gnuplot speed_plot.gnuplot
 	eog vector_fields1.png
 
+pres:
+	gnuplot pressure_plot.gnuplot
+	eog pressure.png
+
 run:
 	$(MAKE) all
 	./a.out

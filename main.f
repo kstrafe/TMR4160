@@ -9,11 +9,11 @@ program navier
 	real(8), dimension(9) :: nn = [0, 5, 10, 20, 30, 40, 60, 100, 500]
 	real(8), dimension(9) :: cc = [1.7, 1.78, 1.86, 1.92, 1.95, 1.96, 1.97, 1.98, 1.99]
 	real(8) :: omega
-	real(8), allocatable :: u(:,:), v(:,:), p(:,:), U_(:,:), V_(:,:), P_(:,:)
+	real(8), allocatable :: u(:,:), v(:,:), p(:,:)
 	real(8) :: fux, fuy, fvx, fvy, visu, visv
-	real(8) :: max_speed = 0, current_speed = 0
+	real(8) :: max_speed = 0, current_speed = 0, max_pressure = 0
 
-	print *, 'Enter n (0 will default to 30): '
+	print *, '# Enter n (0 will default to 30): '
 	read(*,*) n
 	if (n == 0) then
 		n = 30
@@ -33,13 +33,13 @@ program navier
 	v = u
 	p = u
 
-	print *, 'Enter Re (0 will default to 100): '
+	print *, '# Enter Re (0 will default to 100): '
 	read(*,*) Re
 	if (Re < epsi) then
 		Re = 100
 	endif
 
-	print *, 'Enter dt (0 will default to 0.01): '
+	print *, '# Enter dt (0 will default to 0.01): '
 	read(*,*) dt
 	if (dt < epsi) then
 		dt = 0.01
@@ -48,7 +48,7 @@ program navier
 	!print *, h, Re*h**2.0/4.0, 2.0/Re
 	ideal = min(h, Re*h**2.0/4.0, 2.0/Re)
 	if (dt > ideal) then
-		write(*,*) 'Warning! dt should be less than ', ideal
+		print *, '# Warning! dt should be less than ', ideal
 		read(*,*)
 	endif
 
@@ -131,41 +131,53 @@ program navier
 		enddo
 		!print *, 'div = ', div
 		if (iter >= itmax) then
-			 print *, 'Warning! Time t= ', t, ' iter= ', iter,' div= ', div
+			 print *, '# Warning! Time t= ', t, ' iter= ', iter,' div= ', div
 		else
-				write(*,*) 'Time t= ', t, ' iter= ', iter
+				write(*,*) '# Time t= ', t, ' iter= ', iter
 		endif
 		t = t + dt
 	enddo
 
-	do i = 1, n+2
-		print *, 'column ', i
-		do j = 1, n+2
-			write(*,*) j, u(j, i), ' '
-		enddo
-		print *, ''
-	enddo
-	!print *, v
+	!do i = 1, n+2
+		!print *, 'column ', i
+		!do j = 1, n+2
+			!write(*,*) j, u(j, i), ' '
+		!enddo
+		!print *, ''
+	!enddo
 
-	allocate(U_(n,n))
 	do i = 1, n
 		do j = 1, n
 			max_speed = max(sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2), max_speed)
 		enddo
 	enddo
 
-	U_ = 0
-	V_= U_
-	P_ = U_
-	print *, 'START VECTOR FIELD'
+	print *, '# BEGIN VECTOR FIELD'
 	do i = 1, n
 		do j = 1, n
 			current_speed = sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2) / max_speed
 			print *, real(i)/n, real(j)/n, 180/(355/113)*atan2((v(i+1,j)+v(i+1,j+1))/2, (u(i,j+1)+u(i+1,j+1))/2), current_speed
-			P_(j,i) = p(i+1,j+1);
 		enddo
 	enddo
-	! axis([0 n+1 0 n+1]);
+	print *, '# END VECTOR FIELD'
+
+	do i = 1, n
+		do j = 1, n
+			max_pressure = max(p(i+1,j+1), max_pressure)
+		enddo
+	enddo
+
+	print *, '# BEGIN PRESSURE FIELD'
+	do i = 1, n
+		do j = 1, n
+			print *, real(i)/n, real(j)/n, p(i+1,j+1)/max_pressure
+		enddo
+	enddo
+	print *, '# END VECTOR FIELD'
+
+	print *, '# BEGIN STREAM LINE'
+
+	print *, '# END STREAM LINE'
 
 contains
 
