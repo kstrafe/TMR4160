@@ -14,4 +14,4 @@ BEGIN { on = 0; number = 0; }
 	on = 1;
 	print "# Frame", number;
 }
-END { print "Generated", number, "sequence(s)" }
+END { print "# Generated", number, "sequence(s)"; }

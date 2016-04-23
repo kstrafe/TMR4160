@@ -136,6 +136,34 @@ program navier
 				write(*,*) '# Time t= ', t, ' iter= ', iter
 		endif
 		t = t + dt
+
+		do i = 1, n
+			do j = 1, n
+				max_speed = max(sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2), max_speed)
+			enddo
+		enddo
+		print *, '# BEGIN VECTOR FIELD'
+		do i = 1, n
+			do j = 1, n
+				current_speed = sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2) / max_speed
+				print *, real(i)/n, real(j)/n, 180/(355/113)*atan2((v(i+1,j)+v(i+1,j+1))/2, (u(i,j+1)+u(i+1,j+1))/2), current_speed
+			enddo
+		enddo
+		print *, '# END VECTOR FIELD'
+
+		do i = 1, n
+			do j = 1, n
+				max_pressure = max(p(i+1,j+1), max_pressure)
+			enddo
+		enddo
+		print *, '# BEGIN PRESSURE FIELD'
+		do i = 1, n
+			do j = 1, n
+				print *, real(i)/n, real(j)/n, p(i+1,j+1)/max_pressure
+			enddo
+		enddo
+		print *, '# END PRESSURE FIELD'
+
 	enddo
 
 	!do i = 1, n+2
@@ -145,36 +173,6 @@ program navier
 		!enddo
 		!print *, ''
 	!enddo
-
-	do i = 1, n
-		do j = 1, n
-			max_speed = max(sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2), max_speed)
-		enddo
-	enddo
-
-	print *, '# BEGIN VECTOR FIELD'
-	do i = 1, n
-		do j = 1, n
-			current_speed = sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2) / max_speed
-			print *, real(i)/n, real(j)/n, 180/(355/113)*atan2((v(i+1,j)+v(i+1,j+1))/2, (u(i,j+1)+u(i+1,j+1))/2), current_speed
-		enddo
-	enddo
-	print *, '# END VECTOR FIELD'
-
-	do i = 1, n
-		do j = 1, n
-			max_pressure = max(p(i+1,j+1), max_pressure)
-		enddo
-	enddo
-
-	print *, '# BEGIN PRESSURE FIELD'
-	do i = 1, n
-		do j = 1, n
-			print *, real(i)/n, real(j)/n, p(i+1,j+1)/max_pressure
-		enddo
-	enddo
-	print *, '# END VECTOR FIELD'
-
 	allocate(psi(n+1,n+1))
 	do i = 2, n+1
 		psi(i, 1) = psi(i-1, 1) - v(i, 1) * h;
