@@ -1,5 +1,7 @@
 #! /bin/bash
 
+if [ $(ls *.png | wc -l) -gt 0 ]; then rm *.png; fi
+
 plot() {
 	frame=${1%%.image}
 	gnuplot -e "filename='""$frame""'" speed_plot.gnuplot

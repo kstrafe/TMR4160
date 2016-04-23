@@ -11,13 +11,16 @@ real(8), dimension(9) :: cc = [1.7, 1.78, 1.86, 1.92, 1.95, 1.96, 1.97, 1.98, 1.
 real(8) :: omega
 real(8), allocatable :: u(:,:), v(:,:), p(:,:), psi(:,:)
 real(8) :: fux, fuy, fvx, fvy, visu, visv
-real(8) :: max_speed = 0, current_speed = 0, max_pressure = 0
+real(8) :: max_speed = 0, current_speed = 0, max_pressure = 0, min_pressure = 0
 
 print *, '# Enter n (0 will default to 30): '
 read(*,*) n
 if (n == 0) then
 n = 30
 endif
+
+allocate(psi(n+1,n+1))
+psi = 0
 
 bottom = int((n+2)/4 + (n+2)/8);
 height = int((n+2)/4);
@@ -49,7 +52,6 @@ endif
 ideal = min(h, Re*h**2.0/4.0, 2.0/Re)
 if (dt > ideal) then
 print *, '# Warning! dt should be less than ', ideal
-read(*,*)
 endif
 
 t = 0.0
@@ -91,7 +93,6 @@ enddo
 do i = 1, n+2
 v(i,n+1) = 0.0
 v(i,1) = 0.0
-! This is where we set the boundary condition
 u(i,n+2) = -u(i,n+1)
 u(i,1) = -u(i,2)
 enddo
@@ -137,7 +138,8 @@ write(*,*) '# Time t= ', t, ' iter= ', iter
 endif
 t = t + dt
 
-do i = 1, n
+max_speed = sqrt(((v(2,1)+v(2,2))/2)**2 + ((u(1,2)+u(2,2))/2)**2)
+do i = 2, n
 do j = 1, n
 max_speed = max(sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2), max_speed)
 enddo
@@ -151,40 +153,39 @@ enddo
 enddo
 print *, '# END VECTOR FIELD'
 
+min_pressure = p(2,2)
+do i = 2, n
+do j = 1, n
+min_pressure = min(p(i+1,j+1), min_pressure)
+enddo
+enddo
+max_pressure = p(2,2) - min_pressure
 do i = 1, n
 do j = 1, n
-max_pressure = max(p(i+1,j+1), max_pressure)
+max_pressure = max(p(i+1,j+1) - min_pressure, max_pressure)
 enddo
 enddo
 print *, '# BEGIN PRESSURE FIELD'
 do i = 1, n
 do j = 1, n
-print *, real(i)/n, real(j)/n, p(i+1,j+1)/max_pressure
+print *, real(i)/n, real(j)/n, (p(i+1,j+1)-min_pressure)/max_pressure
 enddo
 enddo
 print *, '# END PRESSURE FIELD'
 
-enddo
-
-!do i = 1, n+2
-!print *, 'column ', i
-!do j = 1, n+2
-!write(*,*) j, u(j, i), ' '
-!enddo
-!print *, ''
-!enddo
-allocate(psi(n+1,n+1))
 do i = 2, n+1
 psi(i, 1) = psi(i-1, 1) - v(i, 1) * h;
 enddo
 print *, '# BEGIN STREAM LINE'
-do i = 2, n+1
+do i = 1, n+1
 do j = 2, n+1
 psi(i, j) = psi(i, j-1) + u(i, j) * h;
-print *, i, j, psi(i, j)
+print *, real(i)/(n+1), real(j)/(n+1), -psi(i, j)
 enddo
 enddo
 print *, '# END STREAM LINE'
+
+enddo
 
 contains
 

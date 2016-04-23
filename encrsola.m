@@ -3,12 +3,12 @@
 clear all
 close all
 clc
-n=30;
+n=50;
 epsi=1e-6;
 nn=[0   5    10   20   30   40   60   100  500];
 oo=[1.7 1.78 1.86 1.92 1.95 1.96 1.97 1.98 1.99];
 omega=interp1(nn,oo,n);               % Interpolating a reasonable value
-Re=100;
+Re=300000;
 tmax=10;
 dt=0.01;
 itmax=300;
