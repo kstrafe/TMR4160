@@ -1,10 +1,14 @@
 #! /bin/bash
 
-len=5
+plot() {
+	frame=${1%%.image}
+	gnuplot -e "filename='""$frame""'" speed_plot.gnuplot
+	mv $frame.png $(printf %08d $frame).png
+	echo $1
+}
 for i in *.image; do
-	(
-		frame=${i%%.image}
-		gnuplot -e "filename='""$frame""'" speed_plot.gnuplot
-		mv $frame.png $(printf %08d $frame).png
-	) &
+	while [ $(jobs | wc -l) -ge 8 ]; do
+		sleep 1
+	done
+	plot $i &
 done
