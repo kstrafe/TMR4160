@@ -4,11 +4,14 @@ plot() {
 	frame=${1%%.image}
 	gnuplot -e "filename='""$frame""'" speed_plot.gnuplot
 	mv $frame.png $(printf %08d $frame).png
-	echo $1
 }
+items=$(ls *.png | wc -l)
+iter=0
 for i in *.image; do
 	while [ $(jobs | wc -l) -ge 8 ]; do
 		sleep 1
 	done
 	plot $i &
+	iter=$((iter+1))
+	echo $(LC_NUMERIC="en_US.UTF-8" printf %03.2f $(bc -l <<< 100*$iter.0/$items.0))"% done"
 done
