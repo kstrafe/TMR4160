@@ -9,7 +9,7 @@ program navier
 	real(8), dimension(9) :: nn = [0, 5, 10, 20, 30, 40, 60, 100, 500]
 	real(8), dimension(9) :: cc = [1.7, 1.78, 1.86, 1.92, 1.95, 1.96, 1.97, 1.98, 1.99]
 	real(8) :: omega
-	real(8), allocatable :: u(:,:), v(:,:), p(:,:)
+	real(8), allocatable :: u(:,:), v(:,:), p(:,:), psi(:,:)
 	real(8) :: fux, fuy, fvx, fvy, visu, visv
 	real(8) :: max_speed = 0, current_speed = 0, max_pressure = 0
 
@@ -175,8 +175,17 @@ program navier
 	enddo
 	print *, '# END VECTOR FIELD'
 
+	allocate(psi(n+1,n+1))
+	do i = 2, n+1
+		psi(i, 1) = psi(i-1, 1) - v(i, 1) * h;
+	enddo
 	print *, '# BEGIN STREAM LINE'
-
+	do i = 2, n+1
+		do j = 2, n+1
+			psi(i, j) = psi(i, j-1) + u(i, j) * h;
+			print *, i, j, psi(i, j)
+		enddo
+	enddo
 	print *, '# END STREAM LINE'
 
 contains
