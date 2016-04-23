@@ -4,7 +4,7 @@ if [ $(ls *.png | wc -l) -gt 0 ]; then rm *.png; fi
 
 plot() {
 	frame=${1%%.image}
-	gnuplot -e "filename='""$frame""'" pressure_plot.gnuplot
+	gnuplot -e "filename='""$frame""'" stream_plot.gnuplot
 	mv $frame.png $(printf %08d $frame).png
 }
 items=$(ls *.image | wc -l)

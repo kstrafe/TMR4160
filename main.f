@@ -180,7 +180,7 @@ program navier
 		do i = 1, n+1
 			do j = 2, n+1
 				psi(i, j) = psi(i, j-1) + u(i, j) * h;
-				print *, real(i)/(n+1), real(j)/(n+1), nint(psi(i, j))
+				print *, real(i)/(n+1), real(j)/(n+1), psi(i, j)
 			enddo
 		enddo
 		print *, '# END STREAM LINE'
