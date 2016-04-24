@@ -22,6 +22,11 @@ cd ../pressures
 cd ../streams
 ./everything.sh
 
-while [ $(jobs | wc - l) -gt 0 ]; do
+while [ $(jobs | wc -l) -gt 0 ]; do
+	jobs > /dev/null
 	sleep 0.1
 done
+
+cd ..
+
+# avconv -i 'concat:velocities/out.mpeg|pressures/out.mpeg|streams/out.mpeg' -c copy out.mpeg

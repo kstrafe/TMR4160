@@ -17,6 +17,7 @@ for i in *.image; do
 	iter=$((iter+1))
 	echo $(LC_NUMERIC="en_US.UTF-8" printf %03.2f $(bc -l <<< 100*$iter.0/$items.0))"% done"
 done
-while [ $(jobs | wc -l) -gt 1 ]; do
+while [ $(jobs | wc -l) -gt 0 ]; do
+	jobs > /dev/null
 	sleep 0.1
 done
