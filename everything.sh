@@ -1,5 +1,7 @@
 #! /bin/bash
 
+trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
+
 truncate -s 0 input
 for i in $@; do
 	echo $i >> input
@@ -12,10 +14,14 @@ if [ $? -ne 0 ]; then
 fi
 
 cd velocities
-./everything.sh
+./everything.sh &
 
 cd ../pressures
-./everything.sh
+./everything.sh &
 
 cd ../streams
 ./everything.sh
+
+while [ $(jobs | wc - l) -gt 0 ]; do
+	sleep 0.1
+done
