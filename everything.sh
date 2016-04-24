@@ -2,6 +2,7 @@
 
 trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 
+make
 truncate -s 0 input
 for i in $@; do
 	echo $i >> input
