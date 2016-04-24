@@ -12,7 +12,7 @@ program navier
 	real(8), allocatable :: u(:,:), v(:,:), p(:,:), psi(:,:)
 	real(8) :: fux, fuy, fvx, fvy, visu, visv
 	real(8) :: max_speed = 0, current_speed = 0, max_pressure = 0, min_pressure = 0
-	real(8) :: max_streamline, min_streamline
+	real(8) :: max_streamline, min_streamline, temp
 
 	print *, '# Enter n (0 will default to 30): '
 	read(*,*) n
@@ -149,7 +149,11 @@ program navier
 		do i = 1, n
 			do j = 1, n
 				current_speed = sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2) / max_speed
-				print *, real(i)/n, real(j)/n, 180/(355/113)*atan2((v(i+1,j)+v(i+1,j+1))/2, (u(i,j+1)+u(i+1,j+1))/2), current_speed
+				temp = 180/(355/113)*atan2((v(i+1,j)+v(i+1,j+1))/2, (u(i,j+1)+u(i+1,j+1))/2)
+				print *, real(i)/n, real(j)/n, temp, current_speed
+				if (isNan(temp)) then
+					stop 2
+				endif
 			enddo
 		enddo
 		print *, '# END VECTOR FIELD'
@@ -169,7 +173,11 @@ program navier
 		print *, '# BEGIN PRESSURE FIELD'
 		do i = 1, n
 			do j = 1, n
-				print *, real(i)/n, real(j)/n, (p(i+1,j+1)-min_pressure)/max_pressure
+				temp = (p(i+1,j+1)-min_pressure)/max_pressure
+				print *, real(i)/n, real(j)/n, temp
+				if (isNan(temp)) then
+					stop 2
+				endif
 			enddo
 		enddo
 		print *, '# END PRESSURE FIELD'
@@ -197,9 +205,13 @@ program navier
 		enddo
 		print *, '# BEGIN STREAM LINE'
 
-		do i = 2, n+1
+		do i = 1, n+1
 			do j = 1, n+1
-				print *, real(i)/n, real(j)/n, (psi(i, j) - min_streamline) / max_streamline
+				temp = (psi(i, j) - min_streamline) / max_streamline
+				print *, real(i)/n, real(j)/n, temp
+				if (isNan(temp)) then
+					stop 2
+				endif
 			enddo
 		enddo
 		print *, '# END STREAM LINE'
