@@ -11,3 +11,6 @@ cd velocities
 
 cd ../pressures
 ./everything.sh
+
+cd ../streams
+./everything.sh

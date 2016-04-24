@@ -11,7 +11,7 @@ items=$(ls *.image | wc -l)
 iter=0
 for i in *.image; do
 	while [ $(jobs | wc -l) -ge 8 ]; do
-		sleep 1
+		sleep 0.1
 	done
 	plot $i &
 	iter=$((iter+1))

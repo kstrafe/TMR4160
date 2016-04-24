@@ -12,6 +12,7 @@ real(8) :: omega
 real(8), allocatable :: u(:,:), v(:,:), p(:,:), psi(:,:)
 real(8) :: fux, fuy, fvx, fvy, visu, visv
 real(8) :: max_speed = 0, current_speed = 0, max_pressure = 0, min_pressure = 0
+real(8) :: max_streamline, min_streamline
 
 print *, '# Enter n (0 will default to 30): '
 read(*,*) n
@@ -154,7 +155,7 @@ enddo
 print *, '# END VECTOR FIELD'
 
 min_pressure = p(2,2)
-do i = 2, n
+do i = 1, n
 do j = 1, n
 min_pressure = min(p(i+1,j+1), min_pressure)
 enddo
@@ -176,11 +177,29 @@ print *, '# END PRESSURE FIELD'
 do i = 2, n+1
 psi(i, 1) = psi(i-1, 1) - v(i, 1) * h;
 enddo
-print *, '# BEGIN STREAM LINE'
 do i = 1, n+1
 do j = 2, n+1
 psi(i, j) = psi(i, j-1) + u(i, j) * h;
-print *, real(i)/(n+1), real(j)/(n+1), psi(i, j)
+enddo
+enddo
+
+min_streamline = psi(1, 1);
+do i = 1, n+1
+do j = 1, n+1
+min_streamline = min(min_streamline, psi(i, j))
+enddo
+enddo
+max_streamline = psi(1, 1) - min_streamline;
+do i = 1, n+1
+do j = 1, n+1
+max_streamline = max(max_streamline, psi(i, j)-min_streamline)
+enddo
+enddo
+print *, '# BEGIN STREAM LINE'
+
+do i = 2, n+1
+do j = 1, n+1
+print *, real(i)/n, real(j)/n, (psi(i, j) - min_streamline) / max_streamline
 enddo
 enddo
 print *, '# END STREAM LINE'

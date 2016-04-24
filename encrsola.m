@@ -3,12 +3,12 @@
 clear all
 close all
 clc
-n=10;
+n=30;
 epsi=1e-6;
 nn=[0   5    10   20   30   40   60   100  500];
 oo=[1.7 1.78 1.86 1.92 1.95 1.96 1.97 1.98 1.99];
 omega=interp1(nn,oo,n);               % Interpolating a reasonable value
-Re=30;
+Re=30000;
 tmax=10;
 dt=0.01;
 itmax=300;
@@ -91,22 +91,6 @@ for t=0:dt:tmax                % Main loop
     else
         disp(['Time t= ',num2str(t),' iter= ',int2str(iter)])
     end
-
-	U=zeros(n);
-	V=U;
-	P=U;
-	for i=1:n
-			for j=1:n
-					U(j,i)=(u(i,j+1)+u(i+1,j+1))/2;
-					V(j,i)=(v(i+1,j)+v(i+1,j+1))/2;
-					P(j,i)=p(i+1,j+1);
-			end
-	end
-	figure(1)
-	quiver(U,V);
-	axis([0 n+1 0 n+1]);
-	title(['Velcity vectors, Re =',num2str(Re)])
-	drawnow;
 
 end
 
