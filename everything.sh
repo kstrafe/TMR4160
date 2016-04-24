@@ -6,6 +6,11 @@ for i in $@; do
 done
 ./nstokes < input > output
 
+if [ $? -ne 0 ]; then
+	echo "Invalid input, try adjusting dt and n to be lower"
+	exit 2
+fi
+
 cd velocities
 ./everything.sh
 
