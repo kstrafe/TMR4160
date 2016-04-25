@@ -3,10 +3,12 @@
 trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 
 make
-truncate -s 0 input
-for i in $@; do
-	echo $i >> input
-done
+if [ $# -gt 1 ]; then
+	truncate -s 0 input
+	for i in $@; do
+		echo $i >> input
+	done
+fi
 ./nstokes < input > output
 
 if [ $? -ne 0 ]; then
