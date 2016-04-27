@@ -11,7 +11,8 @@ program navier
 	real(8) :: omega
 	real(8), allocatable :: u(:,:), v(:,:), p(:,:), psi(:,:)
 	real(8) :: fux, fuy, fvx, fvy, visu, visv
-	real(8) :: max_speed = 0, current_speed = 0, max_pressure = 0, min_pressure = 0
+	real(8) :: max_speed = 0, min_speed, current_speed = 0
+	real(8) :: max_pressure = 0, min_pressure = 0
 	real(8) :: max_streamline, min_streamline, temp
 
 	print *, '# Enter n (0 will default to 30): '
@@ -139,18 +140,27 @@ program navier
 		endif
 		t = t + dt
 
-		max_speed = sqrt(((v(2,1)+v(2,2))/2)**2 + ((u(1,2)+u(2,2))/2)**2)
+		min_speed = sqrt(((v(2,1)+v(2,2))/2)**2 + ((u(1,2)+u(2,2))/2)**2)
 		do i = 2, n
 			do j = 1, n
-				max_speed = max(sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2), max_speed)
+				min_speed = min(sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2), min_speed)
 			enddo
 		enddo
+		max_speed = sqrt(((v(2,1)+v(2,2))/2)**2 + ((u(1,2)+u(2,2))/2)**2)-min_speed
+		do i = 2, n
+			do j = 1, n
+				max_speed = max(sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2)-min_speed, max_speed)
+			enddo
+		enddo
+
 		print *, '# BEGIN VECTOR FIELD'
+		print *, '# MAX VALUE', max_speed
+		print *, '# MIN VALUE', min_speed
 		do i = 1, n
 			do j = 1, n
 				current_speed = sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2) / max_speed
 				temp = 180/(355/113)*atan2((v(i+1,j)+v(i+1,j+1))/2, (u(i,j+1)+u(i+1,j+1))/2)
-				print *, real(i-1)/n, real(j-1)/n, temp, current_speed
+				print *, real(i-1)/(n-1), real(j-1)/(n-1), temp, current_speed
 				if (isNan(temp)) then
 					stop 2
 				endif
@@ -171,10 +181,12 @@ program navier
 			enddo
 		enddo
 		print *, '# BEGIN PRESSURE FIELD'
+		print *, '# MAX VALUE', max_pressure
+		print *, '# MIN VALUE', min_pressure
 		do i = 1, n
 			do j = 1, n
 				temp = (p(i+1,j+1)-min_pressure)/max_pressure
-				print *, real(i-1)/n, real(j-1)/n, temp
+				print *, real(i-1)/(n-1), real(j-1)/(n-1), temp
 				if (isNan(temp)) then
 					stop 2
 				endif
@@ -205,10 +217,12 @@ program navier
 		enddo
 
 		print *, '# BEGIN STREAM LINE'
+		print *, '# MAX VALUE', max_streamline
+		print *, '# MIN VALUE', min_streamline
 		do i = 1, n+1
 			do j = 1, n+1
 				temp = (psi(i, j) - min_streamline) / max_streamline
-				print *, real(i-1)/(n), real(j-1)/(n), temp
+				print *, real(i-1)/n, real(j-1)/n, temp
 				if (isNan(temp)) then
 					stop 2
 				endif
