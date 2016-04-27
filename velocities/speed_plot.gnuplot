@@ -6,10 +6,11 @@ reset
 set terminal pngcairo size 2000,2000 enhanced font 'Verdana,10'
 set output filename.".png"
 
-unset key
-unset tics
-unset colorbox
+#unset key
+#unset tics
+#unset colorbox
 set border 0
+set grid
 
 #set palette defined ( \
 #0 '#ffffff', \
