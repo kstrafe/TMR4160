@@ -11,17 +11,18 @@ unset tics
 unset colorbox
 set border 0
 
-set palette defined ( \
-0 '#ffffff', \
-1 '#ffee00',\
-2 '#ff7000',\
-3 '#ee0000',\
-4 '#7f0000')
+#set palette defined ( \
+#0 '#ffffff', \
+#1 '#ffee00',\
+#2 '#ff7000',\
+#3 '#ee0000',\
+#4 '#7f0000')
+set palette rgbformulae 33,13,10
 
-set xrange [0:1]
-set yrange [0:1]
+set xrange [-0.1:1.1]
+set yrange [-0.1:1.1]
 set cbrange [0:1]
-set xzeroaxis
+#set xzeroaxis
 
 h = 0.1
 xf(phi) = h*cos(phi/180.0*pi)
