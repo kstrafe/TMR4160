@@ -29,6 +29,9 @@ h = 0.1
 xf(phi) = h*cos(phi/180.0*pi)
 yf(phi) = h*sin(phi/180.0*pi)
 
+set label "Max Speed: ".max_val at graph 0.5,0.98 center font "Verdana,24"
+set label "Min Speed: ".min_val at graph 0.5,0.95 center font "Verdana,24"
+
 plot filename.".image" \
 	u ($1):($2):(xf($3)/3):(yf($3)/3):4 \
 	with vectors head size 0.2,2,20 filled lc palette lw 5

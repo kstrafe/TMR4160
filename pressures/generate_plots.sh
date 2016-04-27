@@ -3,8 +3,13 @@
 if [ $(ls *.png 2>/dev/null | wc -l) -gt 0 ]; then rm *.png; fi
 
 plot() {
+	max_val=$(../get_max.awk $1)
+	min_val=$(../get_min.awk $1)
 	frame=${1%%.image}
-	gnuplot -e "filename='""$frame""'" pressure_plot.gnuplot
+	gnuplot -e "filename='""$frame""'" \
+		-e "max_val='"$max_val"'" \
+		-e "min_val='"$min_val"'" \
+		pressure_plot.gnuplot
 	mv $frame.png $(printf %08d $frame).png
 }
 items=$(ls *.image | wc -l)
