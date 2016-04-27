@@ -203,12 +203,12 @@ program navier
 				max_streamline = max(max_streamline, psi(i, j)-min_streamline)
 			enddo
 		enddo
-		print *, '# BEGIN STREAM LINE'
 
+		print *, '# BEGIN STREAM LINE'
 		do i = 1, n+1
 			do j = 1, n+1
 				temp = (psi(i, j) - min_streamline) / max_streamline
-				print *, real(i)/n, real(j)/n, temp
+				print *, real(i)/(n+1), real(j)/(n+1), temp
 				if (isNan(temp)) then
 					stop 2
 				endif
