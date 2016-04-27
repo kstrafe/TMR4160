@@ -1,6 +1,6 @@
 #! /bin/bash
 
-if [ $(ls *.png | wc -l) -gt 0 ]; then rm *.png; fi
+if [ $(ls *.png 2>/dev/null | wc -l) -gt 0 ]; then rm *.png; fi
 
 plot() {
 	frame=${1%%.image}
@@ -15,7 +15,7 @@ for i in *.image; do
 	done
 	plot $i &
 	iter=$((iter+1))
-	echo $(LC_NUMERIC="en_US.UTF-8" printf %03.2f $(bc -l <<< 100*$iter.0/$items.0))"% done"
+	echo $(LC_NUMERIC="en_US.UTF-8" printf %03.2f $(bc -l <<< 100*$iter.0/$items.0))"% done with velocity plotting"
 done
 while [ $(jobs | wc -l) -gt 0 ]; do
 	jobs > /dev/null

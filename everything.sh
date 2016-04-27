@@ -9,7 +9,9 @@ if [ $# -gt 1 ]; then
 		echo $i >> input
 	done
 fi
+echo "Running the simulation, hold on..."
 ./nstokes < input > output
+echo "Done with the simulation, processing data..."
 
 if [ $? -ne 0 ]; then
 	echo "Invalid input, try adjusting dt and n to be lower"
