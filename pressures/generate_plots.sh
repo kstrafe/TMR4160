@@ -9,13 +9,17 @@ plot() {
 }
 items=$(ls *.image | wc -l)
 iter=0
+every=40
 for i in *.image; do
 	while [ $(jobs | wc -l) -ge 4 ]; do
 		sleep 0.1
 	done
 	plot $i &
 	iter=$((iter+1))
-	echo $(LC_NUMERIC="en_US.UTF-8" printf %03.2f $(bc -l <<< 100*$iter.0/$items.0))"% done with pressure plotting"
+	if [ $(($iter % $every)) -eq "0" ]; then
+		percent=$(LC_NUMERIC="en_US.UTF-8" printf %03.2f $(bc -l <<< 100*$iter.0/$items.0))
+		echo "$percent% done with pressure plotting"
+	fi
 done
 while [ $(jobs | wc -l) -gt 0 ]; do
 	jobs > /dev/null
