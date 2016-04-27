@@ -150,7 +150,7 @@ program navier
 			do j = 1, n
 				current_speed = sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2) / max_speed
 				temp = 180/(355/113)*atan2((v(i+1,j)+v(i+1,j+1))/2, (u(i,j+1)+u(i+1,j+1))/2)
-				print *, real(i)/n, real(j)/n, temp, current_speed
+				print *, real(i-1)/n, real(j-1)/n, temp, current_speed
 				if (isNan(temp)) then
 					stop 2
 				endif
@@ -174,7 +174,7 @@ program navier
 		do i = 1, n
 			do j = 1, n
 				temp = (p(i+1,j+1)-min_pressure)/max_pressure
-				print *, real(i)/n, real(j)/n, temp
+				print *, real(i-1)/n, real(j-1)/n, temp
 				if (isNan(temp)) then
 					stop 2
 				endif
@@ -208,7 +208,7 @@ program navier
 		do i = 1, n+1
 			do j = 1, n+1
 				temp = (psi(i, j) - min_streamline) / max_streamline
-				print *, real(i)/(n+1), real(j)/(n+1), temp
+				print *, real(i-1)/(n), real(j-1)/(n), temp
 				if (isNan(temp)) then
 					stop 2
 				endif
