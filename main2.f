@@ -234,6 +234,47 @@ enddo
 
 contains
 
+!   --------------------------------------------------------------------
+!   S E A S T A    Subroutine      closestIndex             No.:
+!   --------------------------------------------------------------------
+!
+!   Hensikt :
+!   Finn den nærmeste indeks i et monotont stigende array.
+!   Metode :
+!   Iterer gjennom arrayet. Den posisjonen som inneholder det
+!   minste avviket velges. Denne metoden kan gjøres kjappere
+!   ved bruk av binærsøk.
+!
+!   Kall sekvens .......................................................
+!
+!     CALL        CALMOM(SM0, SM2, GAMMA, HS, TP, W, H, N)
+!
+!   Parametre:
+!   Navn    I/O  Type     Innhold/Beskrivelse
+!   .................................................................
+!   SM0      O    R       0'te spektralmoment
+!   SM2      O    R       2'dre spektralmoment
+!   GAMMA    I    R       parameter til spekter
+!   HS       I    R       parameter til spekter
+!   TP       I    R       parameter til spekter
+!   W        I    R(N)    punkter der vi har gitt transferfunksjonen
+!   H        I    R(N)    transferfunksjonen
+!   N        I    I       antall punkter transferfunksjonen er beskrevet ved
+!   RS       I    R(N)    respons-verdi
+!   RS2      I    R(N)    respons-verdi * w^2
+!
+!
+!     I N T E R N E   V A R I A B L E :
+!     IERR        Feilflagg
+!
+!     F U K S J O N E R :
+!     wspekt      Regner verdien til boelge-spekteret for en gitt w
+!     tabint      integrere en tabulert funksjon
+!   Programmert av: Haavard Holm
+!   Date/Version  : 91.02.18 / 1.0
+!
+! **********************************************************************
+!
 integer function closestIndex(array, arsize, desired)
 ! Let x be a monotonically increasing array
 ! Val is the value to find the closest index to

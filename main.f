@@ -234,6 +234,38 @@ program navier
 
 contains
 
+	!   --------------------------------------------------------------------
+	!     Function                 closestIndex                     No.: 0
+	!   --------------------------------------------------------------------
+	!
+	!   Hensikt :
+	!   Finn den nærmeste indeks i et monotont stigende array.
+	!   Metode :
+	!   Iterer gjennom arrayet. Den posisjonen som inneholder det
+	!   minste avviket velges. Denne metoden kan gjøres kjappere
+	!   ved bruk av binærsøk.
+	!
+	!   Kall sekvens .......................................................
+	!
+	!    closestIndex(array, arsize, desired)
+	!
+	!   Parametre:
+	!   Navn           I/O  Type     Innhold/Beskrivelse
+	!   .................................................................
+	!   closestIndex   O    I       Index til nærmeste tall
+	!   array          I    [I]     Monotont sortert array der tallet ligger
+	!   arsize         I    I       Størrelsen på arrayet
+	!   desired        I    R       Ønsket tall som indeksen skal være nærmest
+	!
+	!     I N T E R N E   V A R I A B L E :
+	!     min_distance        Holder rede på den minimale distansen
+	!     i                   Lagrer den nærmeste indeksen
+	!
+	!   Programmert av: Kevin Robert Stravers
+	!   Date/Version  : 2016.02.17 / 1.0
+	!
+	! **********************************************************************
+	!
 	integer function closestIndex(array, arsize, desired)
 		! Let x be a monotonically increasing array
 		! Val is the value to find the closest index to
@@ -260,6 +292,37 @@ contains
 		end do
 	end
 
+	!   --------------------------------------------------------------------
+	!     Function                 nextClosestIndex                 No.: 1
+	!   --------------------------------------------------------------------
+	!
+	!   Hensikt :
+	!   Finn den nest nærmeste indeks i et monotont stigende array.
+	!   Metode :
+	!   Iterer gjennom arrayet. Den posisjonen som inneholder det
+	!   nest minste avviket velges.
+	!
+	!   Kall sekvens .......................................................
+	!
+	!    nextClosestIndex(array, arsize, closest, desired)
+	!
+	!   Parametre:
+	!   Navn               I/O  Type     Innhold/Beskrivelse
+	!   .................................................................
+	!   nextClosestIndex   O    I       Index til nærmeste tall
+	!   array              I    [I]     Monotont sortert array der tallet ligger
+	!   arsize             I    I       Størrelsen på arrayet
+	!   closest            I    I       Nærmeste index som allerede er funnet
+	!   desired            I    R       Ønsket tall som indeksen skal være nærmest
+	!
+	!     I N T E R N E   V A R I A B L E :
+	!     next_closest        Lagrer den indeksen som tilsvarer nest minste verdi
+	!
+	!   Programmert av: Kevin Robert Stravers
+	!   Date/Version  : 2016.02.17 / 1.0
+	!
+	! **********************************************************************
+	!
 	integer function nextClosestIndex(array, arsize, closest, desired)
 		real(8), dimension(:), intent(in) :: array
 		integer, intent(in) :: arsize
@@ -287,8 +350,38 @@ contains
 		endif
 	end
 
+	!   --------------------------------------------------------------------
+	!     Function                 interp1                          No.: 2
+	!   --------------------------------------------------------------------
+	!
+	!   Hensikt :
+	!   Linaer interpolasjon av en posisjon innen en rekke tall
+	!   Metode :
+	!   Finn venstre og høyre nabo til punktet, og interpoler via
+	!   dy/dx * avstand_fra_venstre + y_venstre
+	!
+	!   Kall sekvens .......................................................
+	!
+	!    interp1(x, y, z, arsize)
+	!
+	!   Parametre:
+	!   Navn           I/O  Type     Innhold/Beskrivelse
+	!   .................................................................
+	!   interp1        O    R(8)     Den interpolerte verdien
+	!   x              I    [R(8)]   Indeksene til array y
+	!   y              I    [R(8)]   Verdiene som skal interpoleres
+	!   z              I    R(8)     Interpolasjons punkt
+	!   arsize         I    I        Størrelsen av hver array
+	!
+	!     I N T E R N E   V A R I A B L E :
+	!     next_closest        Lagrer den indeksen som tilsvarer nest minste verdi
+	!
+	!   Programmert av: Kevin Robert Stravers
+	!   Date/Version  : 2016.02.17 / 1.0
+	!
+	! **********************************************************************
+	!
 	real(8) function interp1(x, y, z, arsize)
-		! Default: linear interpolation
 		implicit none
 		real(8), dimension(:), intent(in) :: x, y
 		real(8), intent(in) :: z
@@ -308,8 +401,35 @@ contains
 		return
 	end
 
+	!   --------------------------------------------------------------------
+	!     Function                 isNan                            No.: 3
+	!   --------------------------------------------------------------------
+	!
+	!   Hensikt :
+	!   Finne ut om en float/double er en IEEE754 NaN
+	!   Metode :
+	!   Bruke IEEE754 sin definisjon at tallet er ulik seg selv:
+	!   (x != x) == true
+	!
+	!   Kall sekvens .......................................................
+	!
+	!    isNan(a)
+	!
+	!   Parametre:
+	!   Navn        I/O  Type     Innhold/Beskrivelse
+	!   .................................................................
+	!   isNan       O    L(4)    False/True om verdien er NaN eller ikke
+	!   a           I    R(8)    Verdien som skal sjekkes
+	!
+	!     I N T E R N E   V A R I A B L E :
+	!       Ingen
+	!
+	!   Programmert av: Kevin Robert Stravers
+	!   Date/Version  : 2016.04.19 / 1.0
+	!
+	! **********************************************************************
+	!
 	logical(4) function isNan(a)
-		! Computes whether or not a value is of the IEEE NaN type
 		implicit none
 		real(8), intent(in) :: a
 		isNan = a /= a
