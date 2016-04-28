@@ -37,7 +37,6 @@ real(8), allocatable :: u(:,:), v(:,:), p(:,:), psi(:,:)
 real(8) :: fux, fuy, fvx, fvy, visu, visv
 
 ! Min og maks verdier for printing
-real(8) :: max_pressure, min_pressure, current_pressure
 real(8) :: max_streamline, min_streamline, current_stream
 
 ! Få grid størrelsen
@@ -165,37 +164,7 @@ t = t + dt
 ! --------------------------------------------------------------------
 
 call printSpeed(u, v)
-
-! Beregn det minste trykket for denne framen
-min_pressure = p(2,2)
-do i = 1, n
-do j = 1, n
-min_pressure = min(p(i+1,j+1), min_pressure)
-enddo
-enddo
-! Beregn det maksimale trykket for denne framen
-max_pressure = p(2,2) - min_pressure
-do i = 1, n
-do j = 1, n
-max_pressure = max(p(i+1,j+1) - min_pressure, max_pressure)
-enddo
-enddo
-
-! Print trykkfeltet
-print *, '# BEGIN PRESSURE FIELD'
-print *, '# MAX VALUE', max_pressure
-print *, '# MIN VALUE', min_pressure
-do i = 1, n
-do j = 1, n
-current_pressure = (p(i+1,j+1)-min_pressure)/max_pressure
-print *, real(i-1)/(n-1), real(j-1)/(n-1), current_pressure
-if (isNan(current_pressure)) then
-stop 2
-endif
-enddo
-enddo
-print *, '# END PRESSURE FIELD'
-
+call printPressure(p)
 ! Beregn strømningsfunksjonen
 do i = 2, n+1
 psi(i, 1) = psi(i-1, 1) - v(i, 1) * h;
@@ -519,6 +488,43 @@ endif
 enddo
 enddo
 print *, '# END VECTOR FIELD'
+
+end
+
+subroutine printPressure(p)
+! Beregn det minste trykket for denne framen
+real(8), allocatable, intent(in) :: p(:,:)
+real(8) :: max_pressure, min_pressure, current_pressure
+
+min_pressure = p(2,2)
+do i = 1, n
+do j = 1, n
+min_pressure = min(p(i+1,j+1), min_pressure)
+enddo
+enddo
+! Beregn det maksimale trykket for denne framen
+max_pressure = p(2,2) - min_pressure
+do i = 1, n
+do j = 1, n
+max_pressure = max(p(i+1,j+1) - min_pressure, max_pressure)
+enddo
+enddo
+
+! Print trykkfeltet
+print *, '# BEGIN PRESSURE FIELD'
+print *, '# MAX VALUE', max_pressure
+print *, '# MIN VALUE', min_pressure
+do i = 1, n
+do j = 1, n
+current_pressure = (p(i+1,j+1)-min_pressure)/max_pressure
+print *, real(i-1)/(n-1), real(j-1)/(n-1), current_pressure
+if (isNan(current_pressure)) then
+stop 2
+endif
+enddo
+enddo
+print *, '# END PRESSURE FIELD'
+
 
 end
 
