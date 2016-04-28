@@ -6,9 +6,9 @@ if [ $(ls *.png 2>/dev/null | wc -l) -gt 0 ]; then rm *.png; fi
 get_values .
 
 plot() {
-	max_val=$(../get_max.awk $1)
-	min_val=$(../get_min.awk $1)
-	cur_time=$(../get_time.awk $1)
+	max_val=$(../get_max.awk $2)
+	min_val=$(../get_min.awk $2)
+	cur_time=$(../get_time.awk $2)
 	frame=${2%%.image}
 	gnuplot -e "filename='""$frame""'" \
 		-e "max_val='"$max_val"'" \
@@ -33,7 +33,7 @@ for i in *.image; do
 	iter=$((iter+1))
 	if [ $(($iter % $every)) -eq "0" ]; then
 		percent=$(LC_NUMERIC="en_US.UTF-8" printf %03.2f $(bc -l <<< 100*$iter.0/$items.0))
-		echo "$percent% done with pressure plotting"
+		echo "$percent% done with $1"
 	fi
 done
 while [ $(jobs | wc -l) -gt 0 ]; do
