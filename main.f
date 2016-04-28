@@ -48,7 +48,7 @@ program navier
 		psi = 0
 
 		! Beregn grensene til boksen
-		bottom = int((n+2)/4 + (n+2)/8);
+		bottom = int(dble(n+2)/4 + dble(n+2)/8);
 		height = int((n+2)/4);
 		top = bottom + height;
 		left = bottom;
