@@ -89,6 +89,12 @@ program navier
 		keep_looping = .false.
 	enddo
 
+	print *, '# Re', Re
+	print *, '# dt', dt
+	print *, '# tmax', tmax
+	print *, '# n', n
+	print *, '# ideal dt', ideal
+
 	t = 0.0
 	do while (t <= tmax)
 		! --------------------------------------------------------------------
