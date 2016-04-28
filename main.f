@@ -466,6 +466,37 @@ contains
 		isNan = a /= a
 	end
 
+	!   --------------------------------------------------------------------
+	!     Function                 query                            No.: 4
+	!   --------------------------------------------------------------------
+	!
+	!   Hensikt :
+	!   Spørre stdin om et tall, og defaulte dersom tallet er mindre enn
+	!   en viss verdi
+	!   Metode :
+	!   Skrive spørsmålet ut og reade fra stdin, deretter sjekke om
+	!   tallet er gyldig
+	!
+	!   Kall sekvens .......................................................
+	!
+	!    query(question, defaulting, epsi)
+	!
+	!   Parametre:
+	!   Navn        I/O  Type     Innhold/Beskrivelse
+	!   .................................................................
+	!   query       O    R(8)    Double verdien som blir lest inn
+	!   question    I    C(*)    Spørsmålet som blir skrive ut
+	!   defaulting  I    R(8)    Verdien som ellers blir brukt om inputt er ugyldig
+	!   epsi        I    R(8)    Verdien som sammenlignes med inputt
+	!
+	!     I N T E R N E   V A R I A B L E :
+	!       Ingen
+	!
+	!   Programmert av: Kevin Robert Stravers
+	!   Date/Version  : 2016.04.28 / 1.0
+	!
+	! **********************************************************************
+	!
 	real(8) function query(question, defaulting, epsi)
 		implicit none
 		character(len=*), intent(in) :: question
