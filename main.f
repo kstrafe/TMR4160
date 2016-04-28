@@ -37,7 +37,6 @@ program navier
 	real(8) :: fux, fuy, fvx, fvy, visu, visv
 
 	! Min og maks verdier for printing
-	real(8) :: max_speed, min_speed, current_speed, angle
 	real(8) :: max_pressure, min_pressure, current_pressure
 	real(8) :: max_streamline, min_streamline, current_stream
 
@@ -81,9 +80,11 @@ program navier
 		print *, '# Varsel! dt bør være mindre enn ', ideal
 	endif
 
-	! Selve navier stokes løseren
 	t = 0.0
 	do while (t <= tmax)
+		! --------------------------------------------------------------------
+		! Start Navier-Stokes tidssteg
+		! --------------------------------------------------------------------
 		i = 2
 		do while (i <= n+1)
 			j = 2
@@ -159,36 +160,11 @@ program navier
 		endif
 		t = t + dt
 
-		! Beregn minste hastighet for denne framen
-		min_speed = sqrt(((v(2,1)+v(2,2))/2)**2 + ((u(1,2)+u(2,2))/2)**2)
-		do i = 2, n
-			do j = 1, n
-				min_speed = min(sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2), min_speed)
-			enddo
-		enddo
-		! Beregn største hastighet for denne framen
-		max_speed = sqrt(((v(2,1)+v(2,2))/2)**2 + ((u(1,2)+u(2,2))/2)**2)-min_speed
-		do i = 2, n
-			do j = 1, n
-				max_speed = max(sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2)-min_speed, max_speed)
-			enddo
-		enddo
+		! --------------------------------------------------------------------
+		! Slutt Navier-Stokes tidssteg
+		! --------------------------------------------------------------------
 
-		! Print ut vektor feltet
-		print *, '# BEGIN VECTOR FIELD'
-		print *, '# MAX VALUE', max_speed
-		print *, '# MIN VALUE', min_speed
-		do i = 1, n
-			do j = 1, n
-				current_speed = sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2) / max_speed
-				angle = 180/(355/113)*atan2((v(i+1,j)+v(i+1,j+1))/2, (u(i,j+1)+u(i+1,j+1))/2)
-				print *, real(i-1)/(n-1), real(j-1)/(n-1), angle, current_speed
-				if (isNan(angle)) then
-					stop 2
-				endif
-			enddo
-		enddo
-		print *, '# END VECTOR FIELD'
+		call printSpeed(u, v)
 
 		! Beregn det minste trykket for denne framen
 		min_pressure = p(2,2)
@@ -506,6 +482,44 @@ contains
 		if (query < epsi) then
 			query = defaulting
 		endif
+	end
+
+	subroutine printSpeed(u, v)
+		! Beregn minste hastighet for denne framen
+		implicit none
+		real(8), allocatable, intent(in) :: u(:,:), v(:,:)
+		real(8) :: min_speed, max_speed, angle, current_speed
+
+		min_speed = sqrt(((v(2,1)+v(2,2))/2)**2 + ((u(1,2)+u(2,2))/2)**2)
+		do i = 2, n
+			do j = 1, n
+				min_speed = min(sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2), min_speed)
+			enddo
+		enddo
+		! Beregn største hastighet for denne framen
+		max_speed = sqrt(((v(2,1)+v(2,2))/2)**2 + ((u(1,2)+u(2,2))/2)**2)-min_speed
+		do i = 2, n
+			do j = 1, n
+				max_speed = max(sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2)-min_speed, max_speed)
+			enddo
+		enddo
+
+		! Print ut vektor feltet
+		print *, '# BEGIN VECTOR FIELD'
+		print *, '# MAX VALUE', max_speed
+		print *, '# MIN VALUE', min_speed
+		do i = 1, n
+			do j = 1, n
+				current_speed = sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2) / max_speed
+				angle = 180/(355/113)*atan2((v(i+1,j)+v(i+1,j+1))/2, (u(i,j+1)+u(i+1,j+1))/2)
+				print *, real(i-1)/(n-1), real(j-1)/(n-1), angle, current_speed
+				if (isNan(angle)) then
+					stop 2
+				endif
+			enddo
+		enddo
+		print *, '# END VECTOR FIELD'
+
 	end
 
 end program
