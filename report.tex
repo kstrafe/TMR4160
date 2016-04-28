@@ -1,4 +1,4 @@
-\documentclass{report}
+\documentclass[listof=totoc]{report}
 \usepackage[utf8]{inputenc}
 \usepackage[a4paper, total={7in, 10in}]{geometry}
 \usepackage{breqn}
@@ -6,6 +6,15 @@
 \usepackage{graphicx}
 \usepackage{listings}
 \usepackage{caption}
+\lstset{literate=%
+	{æ}{{\ae}}1
+	{å}{{\aa}}1
+	{ø}{{\o}}1
+	{Æ}{{\AE}}1
+	{Å}{{\AA}}1
+	{Ø}{{\O}}1
+	{-}{{-}}1
+}
 
 \title{TMR4160 Report}
 \author{Kevin Robert Stravers}
@@ -16,6 +25,7 @@
 \maketitle
 
 \tableofcontents
+\lstlistoflistings
 
 \chapter{Introduction}
 \section{Preliminaries}
@@ -70,20 +80,16 @@ The boundary conditions had to be implemented. Using the knowledge gained from t
 Using values larger than $0.1$ sometimes gave NaN values, depending on the Reynolds number. An upper limit is reached aroung $0.5$. I decided to keep it at $0.1$ to give the algorithm some flexibility.
 
 \begin{verbatim}
-! Venstre og høyre kant av boksen
-do j = bottom, top
-  u(left,j) = 0.0;
-  v(left,j) = -v(left+1,j);
-  u(right,j) = 0.0;
-  v(right+1,j) = -v(right,j);
-enddo
+syscmd(`./getcode.sh main.f 120 149')
 \end{verbatim}
 
 We now have all pressures, streams, and velocities at each time state. The states and positions are normalized into a $[0, 1]$ range and printed line-by-line to a the standard output. Pressures, streams, and velocities are bulk printed, and each bulk is headed by a header that denotes what the data means.
 
 \begin{verbatim}
 # BEGIN VECTOR FIELD
-# Various data here
+# MAX VALUE 0.318
+# MIN VALUE -0.321
+# TIME 0.3499999
 3.33333351E-02   3.33333351E-02 -0.78359460856846219       0.49428533784506190
 ...
 # END VECTOR FIELD
@@ -133,7 +139,7 @@ The plotting script is unique to what is being plotted. The vectors are plotted 
 A single avconv command reads each png file and turns it into a video file. The video can now be displayed using any compatible media player (h264 encoded video). Threading is added for faster processing. The avconv command outputs a '.mov' file. This is a large file because it retains the high quality of the pictures. Compressing to '.webm' format can easily take the size lower than 3 MB, but the quality suffers.
 
 \begin{verbatim}
-avconv -threads 4 -framerate 25 -f image2 -i %08d.png -c:v h264 -crf 1 out.mov
+syscmd(`./getcode.sh tovideo.sh 2 3')
 \end{verbatim}
 
 A thread count of $4$ was chosen because this process runs three times in parallel (for each of the three plots). This means that a total of twelve threads are spawned. A rule for $n$ cores is to optimally use $\frac{3}{2} n$ threads due to time slicing and context switching. This rule is not empirically verified nor any scientific guideline.
@@ -142,13 +148,7 @@ A thread count of $4$ was chosen because this process runs three times in parall
 A simple makefile is used to preprocess the Fortran file. It removes leading tabs and replaces them with spaces.
 
 \begin{verbatim}
-all:
-cat main.f | sed 's/\t/  /g' > main2.f
-gfortran -std=f2008 -Wextra -Wall -Wtabs -ffree-form -pedantic main2.f -o nstokes 2>&1
-
-run:
-$(MAKE) all
-./nstokes
+syscmd(`./getcode.sh makefile')
 \end{verbatim}
 
 \section{Bash: The Glue}
@@ -197,6 +197,7 @@ To run the code:
 \begin{verbatim} ./everything n Re dt tmax skip \end{verbatim} stores the given values in the file 'input'. If 'everything' is run without any input, then it defaults to the last input given.
 
 \chapter{Code}
-TODO: Link in code
+syscmd(`./createlisting.sh')
 
 \end{document}
+
