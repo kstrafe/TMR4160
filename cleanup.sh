@@ -8,3 +8,6 @@ for folder in *; do
 		cd ..
 	fi
 done
+
+rm *.lol *.pdf *.toc *.aux *.log main2.f 2>/dev/null
+rm report1.tex 2>/dev/null
