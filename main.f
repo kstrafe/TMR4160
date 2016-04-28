@@ -36,9 +36,6 @@ program navier
 	! Midlertidige verdier for løsningen av Navier-Stokes
 	real(8) :: fux, fuy, fvx, fvy, visu, visv
 
-	! Min og maks verdier for printing
-	real(8) :: max_streamline, min_streamline, current_stream
-
 	! Få grid størrelsen
 	n = int(query('# Enter n (0 will default to 30): ', dble(30), epsi))
 
@@ -163,49 +160,9 @@ program navier
 		! Slutt Navier-Stokes tidssteg
 		! --------------------------------------------------------------------
 
-		call printSpeed(u, v)
-		call printPressure(p)
-		! Beregn strømningsfunksjonen
-		do i = 2, n+1
-			psi(i, 1) = psi(i-1, 1) - v(i, 1) * h;
-		enddo
-		do i = 1, n+1
-			do j = 2, n+1
-				psi(i, j) = psi(i, j-1) + u(i, j) * h;
-			enddo
-		enddo
-
-		! Finn den minste verdien av strømfunksjonen
-		min_streamline = psi(1, 1);
-		do i = 1, n+1
-			do j = 1, n+1
-				min_streamline = min(min_streamline, psi(i, j))
-			enddo
-		enddo
-
-		! Finn den største verdien av strømfunksjonen
-		max_streamline = psi(1, 1) - min_streamline;
-		do i = 1, n+1
-			do j = 1, n+1
-				max_streamline = max(max_streamline, psi(i, j)-min_streamline)
-			enddo
-		enddo
-
-		! Print ut strømfunksjonen
-		print *, '# BEGIN STREAM LINE'
-		print *, '# MAX VALUE', max_streamline
-		print *, '# MIN VALUE', min_streamline
-		do i = 1, n+1
-			do j = 1, n+1
-				current_stream = (psi(i, j) - min_streamline) / max_streamline
-				print *, real(i-1)/n, real(j-1)/n, current_stream
-				if (isNan(current_stream)) then
-					stop 2
-				endif
-			enddo
-		enddo
-		print *, '# END STREAM LINE'
-
+		call printSpeed(u, v, n)
+		call printPressure(p, n)
+		call printStream(u, v, psi, n)
 	enddo
 
 contains
@@ -453,10 +410,43 @@ contains
 		endif
 	end
 
-	subroutine printSpeed(u, v)
+	!   --------------------------------------------------------------------
+	!     Subroutine                 printSpeed                     No.: 1
+	!   --------------------------------------------------------------------
+	!
+	!   Hensikt :
+	!   Printe hastighetsfeltet til stdout
+	!   Metode :
+	!   Finne maksimal of minimal hastighet, vinkel, og printe hastighetene
+	!   med verdi mellom 0 og 1.
+	!
+	!   Kall sekvens .......................................................
+	!
+	!    printSpeed(u, v, n)
+	!
+	!   Parametre:
+	!   Navn        I/O  Type     Innhold/Beskrivelse
+	!   .................................................................
+	!   u           I    R(:,:)   Hastighet i x-retning
+	!   v           I    R(:,:)   Hastighet i y-retning
+	!   n           I    I        Størrelsen på u og v (kantene)
+	!
+	!     I N T E R N E   V A R I A B L E :
+	!       min_speed      Holder rede på den minste hastigheten
+	!       max_speed      Holder rede på den største hastigheten
+	!       angle          Vinkelen til det nåværende punktet
+	!       current_speed  Hastigheten til det nåværende punktet
+	!
+	!   Programmert av: Kevin Robert Stravers
+	!   Date/Version  : 2016.04.28 / 1.0
+	!
+	! **********************************************************************
+	!
+	subroutine printSpeed(u, v, n)
 		! Beregn minste hastighet for denne framen
 		implicit none
 		real(8), allocatable, intent(in) :: u(:,:), v(:,:)
+		integer, intent(in) :: n
 		real(8) :: min_speed, max_speed, angle, current_speed
 
 		min_speed = sqrt(((v(2,1)+v(2,2))/2)**2 + ((u(1,2)+u(2,2))/2)**2)
@@ -491,9 +481,41 @@ contains
 
 	end
 
-	subroutine printPressure(p)
+	!   --------------------------------------------------------------------
+	!     Subroutine                 printPressure                  No.: 2
+	!   --------------------------------------------------------------------
+	!
+	!   Hensikt :
+	!   Printe trykkfeltet til stdout
+	!   Metode :
+	!   Finne maksimalt of minimalt trykk, verdi, og printe trykket
+	!   med verdi mellom 0 og 1.
+	!
+	!   Kall sekvens .......................................................
+	!
+	!    printPressure(p, n)
+	!
+	!   Parametre:
+	!   Navn        I/O  Type     Innhold/Beskrivelse
+	!   .................................................................
+	!   p           I    R(:,:)   Trykk for hver posisjon
+	!   n           I    I        Størrelsen på p (kantene)
+	!
+	!     I N T E R N E   V A R I A B L E :
+	!       max_pressure      Holder rede på det største trykket
+	!       min_pressure      Holder rede på det minste trykket
+	!       current_pressure  Trykket til det nåværende punktet
+	!
+	!   Programmert av: Kevin Robert Stravers
+	!   Date/Version  : 2016.04.28 / 1.0
+	!
+	! **********************************************************************
+	!
+	subroutine printPressure(p, n)
+		implicit none
 		! Beregn det minste trykket for denne framen
 		real(8), allocatable, intent(in) :: p(:,:)
+		integer, intent(in) :: n
 		real(8) :: max_pressure, min_pressure, current_pressure
 
 		min_pressure = p(2,2)
@@ -525,6 +547,87 @@ contains
 		enddo
 		print *, '# END PRESSURE FIELD'
 
+	end
+
+	!   --------------------------------------------------------------------
+	!     Subroutine                 printStream                    No.: 3
+	!   --------------------------------------------------------------------
+	!
+	!   Hensikt :
+	!   Printe strømfunksjonen til stdout
+	!   Metode :
+	!   Finne maksimal og minimal strøm, og normaliser strømingen i punktet.
+	!   Print denne verdien til stdout
+	!
+	!   Kall sekvens .......................................................
+	!
+	!    printStream(u, v, psi, n)
+	!
+	!   Parametre:
+	!   Navn        I/O  Type     Innhold/Beskrivelse
+	!   .................................................................
+	!   u           I    R(:,:)   Hastighet i x-retning
+	!   v           I    R(:,:)   Hastighet i y-retning
+	!   psi         I    R(:,:)   Strømfeltet
+	!   n           I    I        Størrelsen på p (kantene)
+	!
+	!     I N T E R N E   V A R I A B L E :
+	!       max_streamline      Holder rede på den største strøm
+	!       min_streamline      Holder rede på den minste strøm
+	!       current_stream      Strøm til det nåværende punktet
+	!
+	!   Programmert av: Kevin Robert Stravers
+	!   Date/Version  : 2016.04.28 / 1.0
+	!
+	! **********************************************************************
+	!
+	subroutine printStream(u, v, psi, n)
+		implicit none
+		! Beregn strømningsfunksjonen
+		real(8), allocatable, intent(in) :: u(:,:), v(:,:)
+		real(8), allocatable :: psi(:,:)
+		integer, intent(in) :: n
+		real(8) :: max_streamline, min_streamline, current_stream
+
+		do i = 2, n+1
+			psi(i, 1) = psi(i-1, 1) - v(i, 1) * h;
+		enddo
+		do i = 1, n+1
+			do j = 2, n+1
+				psi(i, j) = psi(i, j-1) + u(i, j) * h;
+			enddo
+		enddo
+
+		! Finn den minste verdien av strømfunksjonen
+		min_streamline = psi(1, 1);
+		do i = 1, n+1
+			do j = 1, n+1
+				min_streamline = min(min_streamline, psi(i, j))
+			enddo
+		enddo
+
+		! Finn den største verdien av strømfunksjonen
+		max_streamline = psi(1, 1) - min_streamline;
+		do i = 1, n+1
+			do j = 1, n+1
+				max_streamline = max(max_streamline, psi(i, j)-min_streamline)
+			enddo
+		enddo
+
+		! Print ut strømfunksjonen
+		print *, '# BEGIN STREAM LINE'
+		print *, '# MAX VALUE', max_streamline
+		print *, '# MIN VALUE', min_streamline
+		do i = 1, n+1
+			do j = 1, n+1
+				current_stream = (psi(i, j) - min_streamline) / max_streamline
+				print *, real(i-1)/n, real(j-1)/n, current_stream
+				if (isNan(current_stream)) then
+					stop 2
+				endif
+			enddo
+		enddo
+		print *, '# END STREAM LINE'
 
 	end
 

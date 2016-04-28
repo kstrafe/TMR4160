@@ -36,9 +36,6 @@ real(8), allocatable :: u(:,:), v(:,:), p(:,:), psi(:,:)
 ! Midlertidige verdier for løsningen av Navier-Stokes
 real(8) :: fux, fuy, fvx, fvy, visu, visv
 
-! Min og maks verdier for printing
-real(8) :: max_streamline, min_streamline, current_stream
-
 ! Få grid størrelsen
 n = int(query('# Enter n (0 will default to 30): ', dble(30), epsi))
 
@@ -163,49 +160,9 @@ t = t + dt
 ! Slutt Navier-Stokes tidssteg
 ! --------------------------------------------------------------------
 
-call printSpeed(u, v)
-call printPressure(p)
-! Beregn strømningsfunksjonen
-do i = 2, n+1
-psi(i, 1) = psi(i-1, 1) - v(i, 1) * h;
-enddo
-do i = 1, n+1
-do j = 2, n+1
-psi(i, j) = psi(i, j-1) + u(i, j) * h;
-enddo
-enddo
-
-! Finn den minste verdien av strømfunksjonen
-min_streamline = psi(1, 1);
-do i = 1, n+1
-do j = 1, n+1
-min_streamline = min(min_streamline, psi(i, j))
-enddo
-enddo
-
-! Finn den største verdien av strømfunksjonen
-max_streamline = psi(1, 1) - min_streamline;
-do i = 1, n+1
-do j = 1, n+1
-max_streamline = max(max_streamline, psi(i, j)-min_streamline)
-enddo
-enddo
-
-! Print ut strømfunksjonen
-print *, '# BEGIN STREAM LINE'
-print *, '# MAX VALUE', max_streamline
-print *, '# MIN VALUE', min_streamline
-do i = 1, n+1
-do j = 1, n+1
-current_stream = (psi(i, j) - min_streamline) / max_streamline
-print *, real(i-1)/n, real(j-1)/n, current_stream
-if (isNan(current_stream)) then
-stop 2
-endif
-enddo
-enddo
-print *, '# END STREAM LINE'
-
+call printSpeed(u, v, n)
+call printPressure(p, n)
+call printStream(u, v, psi, n)
 enddo
 
 contains
@@ -453,10 +410,11 @@ query = defaulting
 endif
 end
 
-subroutine printSpeed(u, v)
+subroutine printSpeed(u, v, n)
 ! Beregn minste hastighet for denne framen
 implicit none
 real(8), allocatable, intent(in) :: u(:,:), v(:,:)
+integer, intent(in) :: n
 real(8) :: min_speed, max_speed, angle, current_speed
 
 min_speed = sqrt(((v(2,1)+v(2,2))/2)**2 + ((u(1,2)+u(2,2))/2)**2)
@@ -491,9 +449,11 @@ print *, '# END VECTOR FIELD'
 
 end
 
-subroutine printPressure(p)
+subroutine printPressure(p, n)
+implicit none
 ! Beregn det minste trykket for denne framen
 real(8), allocatable, intent(in) :: p(:,:)
+integer, intent(in) :: n
 real(8) :: max_pressure, min_pressure, current_pressure
 
 min_pressure = p(2,2)
@@ -525,6 +485,55 @@ enddo
 enddo
 print *, '# END PRESSURE FIELD'
 
+end
+
+subroutine printStream(u, v, psi, n)
+implicit none
+! Beregn strømningsfunksjonen
+real(8), allocatable, intent(in) :: u(:,:), v(:,:)
+real(8), allocatable :: psi(:,:)
+integer, intent(in) :: n
+real(8) :: max_streamline, min_streamline, current_stream
+
+do i = 2, n+1
+psi(i, 1) = psi(i-1, 1) - v(i, 1) * h;
+enddo
+do i = 1, n+1
+do j = 2, n+1
+psi(i, j) = psi(i, j-1) + u(i, j) * h;
+enddo
+enddo
+
+! Finn den minste verdien av strømfunksjonen
+min_streamline = psi(1, 1);
+do i = 1, n+1
+do j = 1, n+1
+min_streamline = min(min_streamline, psi(i, j))
+enddo
+enddo
+
+! Finn den største verdien av strømfunksjonen
+max_streamline = psi(1, 1) - min_streamline;
+do i = 1, n+1
+do j = 1, n+1
+max_streamline = max(max_streamline, psi(i, j)-min_streamline)
+enddo
+enddo
+
+! Print ut strømfunksjonen
+print *, '# BEGIN STREAM LINE'
+print *, '# MAX VALUE', max_streamline
+print *, '# MIN VALUE', min_streamline
+do i = 1, n+1
+do j = 1, n+1
+current_stream = (psi(i, j) - min_streamline) / max_streamline
+print *, real(i-1)/n, real(j-1)/n, current_stream
+if (isNan(current_stream)) then
+stop 2
+endif
+enddo
+enddo
+print *, '# END STREAM LINE'
 
 end
 
