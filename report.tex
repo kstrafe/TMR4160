@@ -36,6 +36,11 @@ A duct with constant flow from the left to the right, with borders at the top an
 \includegraphics[width=3in]{boundary_condition.png}
 \end{center}
 
+\chapter{Theory}
+\section{Navier-Stokes}
+The Navier-Stokes equations are solved by the method implemented in \emph{sola.m} file.
+
+$$ \frac{1}{\rho} \nabla (p^{n+1} - p^n) $$
 
 \chapter{Technicalities}
 \section{OS Selection}
@@ -67,10 +72,10 @@ Using values larger than $0.1$ sometimes gave NaN values, depending on the Reyno
 \begin{verbatim}
 ! Venstre og høyre kant av boksen
 do j = bottom, top
-u(left,j) = 0.0;
-v(left,j) = -v(left+1,j);
-u(right,j) = 0.0;
-v(right+1,j) = -v(right,j);
+  u(left,j) = 0.0;
+  v(left,j) = -v(left+1,j);
+  u(right,j) = 0.0;
+  v(right+1,j) = -v(right,j);
 enddo
 \end{verbatim}
 
@@ -107,15 +112,7 @@ The exemplary modus operandi is when a \emph{\# BEGIN PRESSURE FIELD} tag is fou
 The output of awk is piped into a new file. Another awk script separates each frame and puts it into a 'number.image' file. Where number denotes the current frame.
 
 \begin{verbatim}
-#! /usr/bin/awk -f
-
-BEGIN { number = 0; }
-/# Frame/ {
-number += 1;
-}
-// {
-print $0 > number".image";
-}
+syscmd(`./getcode.sh split_on_frame.awk')
 \end{verbatim}
 
 Other uses for awk were to simply gather data from the output file. Data such as the Reynolds number and time step were useful to display. I considered it too bothersome to use Fortran's file API. The stdout and awk method is universal and scales well. Awk exits after finding a matching line. Since these matching lines are at the top of the file, the runtime of awk can be considered constant here.
@@ -123,12 +120,7 @@ Other uses for awk were to simply gather data from the output file. Data such as
 Awk is also used to retrieve the \emph{MAX VALUE}, \emph{MIN VALUE}, and \emph{TIME} values from each frame. This is where awk fits naturally considering that it splits tabular data on spaces. The data is easily retrieved using a tiny script.
 
 \begin{verbatim}
-#! /usr/bin/awk -f
-
-/# MAX VALUE/ {
-print $4;
-exit 0;
-}
+syscmd(`./getcode.sh get_max.awk')
 \end{verbatim}
 
 
