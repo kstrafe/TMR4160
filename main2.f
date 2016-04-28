@@ -28,7 +28,7 @@ program navier
   integer :: top, bottom, left, right, height
 
   ! Maskin epsilon
-  real(8) :: epsi = 1e-6
+  real(8), parameter :: epsi = 1e-6
 
   ! Hastighet, trykk, og strømningsfelt
   real(8), allocatable :: u(:,:), v(:,:), p(:,:), psi(:,:)
@@ -530,7 +530,7 @@ contains
     do i = 1, n
       do j = 1, n
         current_speed = sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2) / max_speed
-        angle = 180/(355/113)*atan2((v(i+1,j)+v(i+1,j+1))/2, (u(i,j+1)+u(i+1,j+1))/2)
+        angle = atan2((v(i+1,j)+v(i+1,j+1))/2, (u(i,j+1)+u(i+1,j+1))/2)
         print *, real(i-1)/(n-1), real(j-1)/(n-1), angle, current_speed
         if (isNan(angle)) then
           stop 2

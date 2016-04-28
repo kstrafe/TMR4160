@@ -26,8 +26,8 @@ set cbrange [0:1]
 #set xzeroaxis
 
 h = 0.1
-xf(phi) = h*cos(phi/180.0*pi)
-yf(phi) = h*sin(phi/180.0*pi)
+xf(phi) = h*cos(phi)
+yf(phi) = h*sin(phi)
 
 set label "dt: ".dt at graph 0.2,0.98 center font "Verdana,24"
 set label "Max Speed: ".max_val at graph 0.5,0.98 center font "Verdana,24"
