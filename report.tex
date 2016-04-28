@@ -48,9 +48,50 @@ A duct with constant flow from the left to the right, with borders at the top an
 
 \chapter{Theory}
 \section{Navier-Stokes}
-The Navier-Stokes equations are solved by the method implemented in \emph{sola.m} file.
+The Navier-Stokes equations are solved by the method implemented in \emph{sola.m} file. The equations to be solved are the laplace equation and the Navier-Stokes equation in two dimensions.
 
-$$ \frac{1}{\rho} \nabla (p^{n+1} - p^n) $$
+$$ \nabla^2 \cdot \vec{v} = 0 $$
+$$ \frac{\partial \vec{v}}{\partial t} + (\vec{v} \cdot \nabla) \vec{v} = -\frac{1}{\rho} \nabla p^{n+1} + \mu \nabla^2 \vec{v}^n $$
+
+For 2D, incompressible flow.
+The differential of velocity with respect to time is discretized by the forward Euler method.
+
+\begin{equation}
+\frac{\vec{v}^{n+1} - \vec{v}^n}{\Delta t} + (\vec{v}^n \cdot \nabla) \vec{v}^n = -\frac{1}{\rho} + \nabla p^{n+1} \mu \nabla^2 \vec{v}^n
+\end{equation}
+
+We don't have sufficiently many equations, so we instead create an intermediate point that uses the old pressure at that point.
+
+\begin{equation}
+\frac{\vec{v}^{*} - \vec{v}^n}{\Delta t} + (\vec{v}^n \cdot \nabla) \vec{v}^n = -\frac{1}{\rho} + \nabla p^{n} \mu \nabla^2 \vec{v}^n
+\end{equation}
+
+Now we can subtract (2.1) by (2.2). This yields the following.
+
+\begin{equation}
+\frac{\vec{v}^{n+1} - \vec{v}^*}{\Delta t} = -\frac{1}{\rho} \nabla (p^{n+1} - p^{n})
+\end{equation}
+
+We also know that the divergence at any point in the flow field is zero.
+
+$$ \nabla \cdot \vec{v}^{n+1} = 0 $$
+
+This can be exploited together with equation (2.3).
+
+\begin{equation}
+\frac{\nabla \cdot \vec{v}^*}{\Delta t} = -\frac{1}{\rho} \nabla^2 (p^{n+1} - p^{n})
+\end{equation}
+
+To get the desired output, we need to calculate $\vec{V}^*$ from the pressure $p^n$.
+Then, the Poisson equation for $p^{n+1}$ must be solved.
+Finally, $\vec{v}^{n+1}$ is updated.
+
+The divergence of the speed is discretized by
+
+$$ (\nabla \cdot \vec{v})_{i,j} \approx \frac{u_{i,j} - u_{i-1,j}}{\Delta x} + \frac{v_{i,j} - v_{i,j-1}}{\Delta y} $$
+
+This is what the algorithm attempts to solve.
+
 
 \chapter{Technicalities}
 \section{OS Selection}
