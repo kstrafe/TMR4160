@@ -36,45 +36,58 @@ program navier
 	! Midlertidige verdier for løsningen av Navier-Stokes
 	real(8) :: fux, fuy, fvx, fvy, visu, visv
 
-	! Få grid størrelsen
-	n = int(query('# Enter n (0 will default to 30): ', dble(30), epsi))
+	! Om vi skal spørre igjen
+	logical(4) :: keep_looping = .true.
 
-	! Alloker minne til strømfunksjonens verdier
-	allocate(psi(n+1,n+1))
-	psi = 0
+	do while (keep_looping)
+		! Få grid størrelsen
+		n = int(query('# Enter n (0 will default to 30): ', dble(30), epsi))
 
-	! Beregn grensene til boksen
-	bottom = int((n+2)/4 + (n+2)/8);
-	height = int((n+2)/4);
-	top = bottom + height;
-	left = bottom;
-	right = top;
+		! Alloker minne til strømfunksjonens verdier
+		allocate(psi(n+1,n+1))
+		psi = 0
 
-	! Opprett hastighetsfelt og trykkfelt
-	allocate(u(n+2,n+2))
-	u = 0
-	v = u
-	p = u
+		! Beregn grensene til boksen
+		bottom = int((n+2)/4 + (n+2)/8);
+		height = int((n+2)/4);
+		top = bottom + height;
+		left = bottom;
+		right = top;
 
-	! Få reynolds tallet i strømningen
-	Re = query('# Enter Re (0 will default to 100): ', dble(100), epsi)
+		! Opprett hastighetsfelt og trykkfelt
+		allocate(u(n+2,n+2))
+		u = 0
+		v = u
+		p = u
 
-	! Få ut tidsskrittet
-	dt = query('# Enter dt (0 will default to 0.01): ', dble(0.01), epsi)
+		! Få reynolds tallet i strømningen
+		Re = query('# Enter Re (0 will default to 100): ', dble(100), epsi)
 
-	! Få ut den endelige tiden
-	tmax = query('# Enter tmax (0 will default to 10): ', dble(10), epsi)
+		! Få ut tidsskrittet
+		dt = query('# Enter dt (0 will default to 0.01): ', dble(0.01), epsi)
 
-	! Beregn stabilitetsverdier
-	omega = interp1(nn, cc, dble(n), 9)
-	h = 1/real(n)
-	beta = omega*h**2/(4*dt)
+		! Få ut den endelige tiden
+		tmax = query('# Enter tmax (0 will default to 10): ', dble(10), epsi)
 
-	! Varsle dersom metoden kan være ustabil
-	ideal = min(h, Re*h**2.0/4.0, 2.0/Re)
-	if (dt > ideal) then
-		print *, '# Varsel! dt bør være mindre enn ', ideal
-	endif
+		! Beregn stabilitetsverdier
+		omega = interp1(nn, cc, dble(n), 9)
+		h = 1/real(n)
+		beta = omega*h**2/(4*dt)
+
+		! Varsle dersom metoden kan være ustabil
+		ideal = min(h, Re*h**2.0/4.0, 2.0/Re)
+		if (dt > ideal) then
+			print *, '# Varsel! dt bør være mindre enn ', ideal
+			if (.not. queryBool('# Ønsker du å fortsette med disse verdier? (y/Y for ja, ellers nei): ')) then
+				deallocate(psi)
+				deallocate(u)
+				deallocate(v)
+				deallocate(p)
+				cycle
+			endif
+		endif
+		keep_looping = .false.
+	enddo
 
 	t = 0.0
 	do while (t <= tmax)
@@ -161,9 +174,9 @@ program navier
 		! --------------------------------------------------------------------
 
 		! Print resultatene til stdout slik de kan bli gjort om til bilder
-		call printSpeed(u, v, n)
-		call printPressure(p, n)
-		call printStream(u, v, psi, n)
+		call printSpeed(u, v, n, t)
+		call printPressure(p, n, t)
+		call printStream(u, v, psi, n, t)
 	enddo
 
 contains
@@ -411,6 +424,15 @@ contains
 		endif
 	end
 
+	logical(4) function queryBool(question)
+		implicit none
+		character(len=*), intent(in) :: question
+		character(1) :: answer
+		print *, question
+		read (*,*) answer
+		queryBool = answer == 'y' .or. answer == 'Y'
+	end
+
 	!   --------------------------------------------------------------------
 	!     Subroutine                 printSpeed                     No.: 1
 	!   --------------------------------------------------------------------
@@ -431,6 +453,7 @@ contains
 	!   u           I    R(:,:)   Hastighet i x-retning
 	!   v           I    R(:,:)   Hastighet i y-retning
 	!   n           I    I        Størrelsen på u og v (kantene)
+	!   t           I    R(8)     Tiden nå
 	!
 	!     I N T E R N E   V A R I A B L E :
 	!       min_speed      Holder rede på den minste hastigheten
@@ -443,11 +466,12 @@ contains
 	!
 	! **********************************************************************
 	!
-	subroutine printSpeed(u, v, n)
+	subroutine printSpeed(u, v, n, t)
 		! Beregn minste hastighet for denne framen
 		implicit none
 		real(8), allocatable, intent(in) :: u(:,:), v(:,:)
 		integer, intent(in) :: n
+		real(8), intent(in) :: t
 		real(8) :: min_speed, max_speed, angle, current_speed
 
 		min_speed = sqrt(((v(2,1)+v(2,2))/2)**2 + ((u(1,2)+u(2,2))/2)**2)
@@ -468,6 +492,7 @@ contains
 		print *, '# BEGIN VECTOR FIELD'
 		print *, '# MAX VALUE', max_speed
 		print *, '# MIN VALUE', min_speed
+		print *, '# TIME', t
 		do i = 1, n
 			do j = 1, n
 				current_speed = sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2) / max_speed
@@ -501,6 +526,7 @@ contains
 	!   .................................................................
 	!   p           I    R(:,:)   Trykk for hver posisjon
 	!   n           I    I        Størrelsen på p (kantene)
+	!   t           I    R(8)     Tiden nå
 	!
 	!     I N T E R N E   V A R I A B L E :
 	!       max_pressure      Holder rede på det største trykket
@@ -512,11 +538,12 @@ contains
 	!
 	! **********************************************************************
 	!
-	subroutine printPressure(p, n)
+	subroutine printPressure(p, n, t)
 		implicit none
 		! Beregn det minste trykket for denne framen
 		real(8), allocatable, intent(in) :: p(:,:)
 		integer, intent(in) :: n
+		real(8), intent(in) :: t
 		real(8) :: max_pressure, min_pressure, current_pressure
 
 		min_pressure = p(2,2)
@@ -537,6 +564,7 @@ contains
 		print *, '# BEGIN PRESSURE FIELD'
 		print *, '# MAX VALUE', max_pressure
 		print *, '# MIN VALUE', min_pressure
+		print *, '# TIME', t
 		do i = 1, n
 			do j = 1, n
 				current_pressure = (p(i+1,j+1)-min_pressure)/max_pressure
@@ -571,6 +599,7 @@ contains
 	!   v           I    R(:,:)   Hastighet i y-retning
 	!   psi         I    R(:,:)   Strømfeltet
 	!   n           I    I        Størrelsen på p (kantene)
+	!   t           I    R(8)     Tiden nå
 	!
 	!     I N T E R N E   V A R I A B L E :
 	!       max_streamline      Holder rede på den største strøm
@@ -582,11 +611,12 @@ contains
 	!
 	! **********************************************************************
 	!
-	subroutine printStream(u, v, psi, n)
+	subroutine printStream(u, v, psi, n, t)
 		implicit none
 		! Beregn strømningsfunksjonen
 		real(8), allocatable, intent(in) :: u(:,:), v(:,:)
 		real(8), allocatable :: psi(:,:)
+		real(8), intent(in) :: t
 		integer, intent(in) :: n
 		real(8) :: max_streamline, min_streamline, current_stream
 
@@ -619,6 +649,7 @@ contains
 		print *, '# BEGIN STREAM LINE'
 		print *, '# MAX VALUE', max_streamline
 		print *, '# MIN VALUE', min_streamline
+		print *, '# TIME', t
 		do i = 1, n+1
 			do j = 1, n+1
 				current_stream = (psi(i, j) - min_streamline) / max_streamline
