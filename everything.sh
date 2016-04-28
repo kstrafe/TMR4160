@@ -34,4 +34,4 @@ done
 
 cd ..
 
-# avconv -i 'concat:velocities/out.mpeg|pressures/out.mpeg|streams/out.mpeg' -c copy out.mpeg
+vlc $(find -name '*.mov')
