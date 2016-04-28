@@ -160,6 +160,7 @@ t = t + dt
 ! Slutt Navier-Stokes tidssteg
 ! --------------------------------------------------------------------
 
+! Print resultatene til stdout slik de kan bli gjort om til bilder
 call printSpeed(u, v, n)
 call printPressure(p, n)
 call printStream(u, v, psi, n)
@@ -410,6 +411,38 @@ query = defaulting
 endif
 end
 
+!   --------------------------------------------------------------------
+!     Subroutine                 printSpeed                     No.: 1
+!   --------------------------------------------------------------------
+!
+!   Hensikt :
+!   Printe hastighetsfeltet til stdout
+!   Metode :
+!   Finne maksimal of minimal hastighet, vinkel, og printe hastighetene
+!   med verdi mellom 0 og 1.
+!
+!   Kall sekvens .......................................................
+!
+!    printSpeed(u, v, n)
+!
+!   Parametre:
+!   Navn        I/O  Type     Innhold/Beskrivelse
+!   .................................................................
+!   u           I    R(:,:)   Hastighet i x-retning
+!   v           I    R(:,:)   Hastighet i y-retning
+!   n           I    I        Størrelsen på u og v (kantene)
+!
+!     I N T E R N E   V A R I A B L E :
+!       min_speed      Holder rede på den minste hastigheten
+!       max_speed      Holder rede på den største hastigheten
+!       angle          Vinkelen til det nåværende punktet
+!       current_speed  Hastigheten til det nåværende punktet
+!
+!   Programmert av: Kevin Robert Stravers
+!   Date/Version  : 2016.04.28 / 1.0
+!
+! **********************************************************************
+!
 subroutine printSpeed(u, v, n)
 ! Beregn minste hastighet for denne framen
 implicit none
@@ -449,6 +482,36 @@ print *, '# END VECTOR FIELD'
 
 end
 
+!   --------------------------------------------------------------------
+!     Subroutine                 printPressure                  No.: 2
+!   --------------------------------------------------------------------
+!
+!   Hensikt :
+!   Printe trykkfeltet til stdout
+!   Metode :
+!   Finne maksimalt of minimalt trykk, verdi, og printe trykket
+!   med verdi mellom 0 og 1.
+!
+!   Kall sekvens .......................................................
+!
+!    printPressure(p, n)
+!
+!   Parametre:
+!   Navn        I/O  Type     Innhold/Beskrivelse
+!   .................................................................
+!   p           I    R(:,:)   Trykk for hver posisjon
+!   n           I    I        Størrelsen på p (kantene)
+!
+!     I N T E R N E   V A R I A B L E :
+!       max_pressure      Holder rede på det største trykket
+!       min_pressure      Holder rede på det minste trykket
+!       current_pressure  Trykket til det nåværende punktet
+!
+!   Programmert av: Kevin Robert Stravers
+!   Date/Version  : 2016.04.28 / 1.0
+!
+! **********************************************************************
+!
 subroutine printPressure(p, n)
 implicit none
 ! Beregn det minste trykket for denne framen
@@ -487,6 +550,38 @@ print *, '# END PRESSURE FIELD'
 
 end
 
+!   --------------------------------------------------------------------
+!     Subroutine                 printStream                    No.: 3
+!   --------------------------------------------------------------------
+!
+!   Hensikt :
+!   Printe strømfunksjonen til stdout
+!   Metode :
+!   Finne maksimal og minimal strøm, og normaliser strømingen i punktet.
+!   Print denne verdien til stdout
+!
+!   Kall sekvens .......................................................
+!
+!    printStream(u, v, psi, n)
+!
+!   Parametre:
+!   Navn        I/O  Type     Innhold/Beskrivelse
+!   .................................................................
+!   u           I    R(:,:)   Hastighet i x-retning
+!   v           I    R(:,:)   Hastighet i y-retning
+!   psi         I    R(:,:)   Strømfeltet
+!   n           I    I        Størrelsen på p (kantene)
+!
+!     I N T E R N E   V A R I A B L E :
+!       max_streamline      Holder rede på den største strøm
+!       min_streamline      Holder rede på den minste strøm
+!       current_stream      Strøm til det nåværende punktet
+!
+!   Programmert av: Kevin Robert Stravers
+!   Date/Version  : 2016.04.28 / 1.0
+!
+! **********************************************************************
+!
 subroutine printStream(u, v, psi, n)
 implicit none
 ! Beregn strømningsfunksjonen

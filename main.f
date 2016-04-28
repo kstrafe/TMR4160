@@ -160,6 +160,7 @@ program navier
 		! Slutt Navier-Stokes tidssteg
 		! --------------------------------------------------------------------
 
+		! Print resultatene til stdout slik de kan bli gjort om til bilder
 		call printSpeed(u, v, n)
 		call printPressure(p, n)
 		call printStream(u, v, psi, n)
