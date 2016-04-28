@@ -1,5 +1,25 @@
 #! /bin/bash
 
+depend() {
+	command -v $1 >/dev/null 2>&1 || {
+		echo "This script requires $1, but it's not installed. Aborting." >&2
+		exit 1
+	}
+}
+
+depend avconv
+depend awk
+depend cp
+depend find
+depend gfortran
+depend gnuplot
+depend ls
+depend make
+depend mv
+depend rm
+depend vlc
+depend wc
+
 trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 
 make
