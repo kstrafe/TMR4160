@@ -5,3 +5,7 @@ all:
 run:
 	$(MAKE) all
 	./nstokes
+
+doc:
+	pdflatex report.tex
+	evince report.pdf
