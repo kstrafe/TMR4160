@@ -424,6 +424,34 @@ contains
 		endif
 	end
 
+	!   --------------------------------------------------------------------
+	!     Function                 queryBool                        No.: 5
+	!   --------------------------------------------------------------------
+	!
+	!   Hensikt :
+	!   Spørre via stdin om ja eller nei ved y/n
+	!   Metode :
+	!   Sjekke om inputt er y eller Y, ellers blir det nei
+	!
+	!   Kall sekvens .......................................................
+	!
+	!    queryBool(question)
+	!
+	!   Parametre:
+	!   Navn        I/O  Type     Innhold/Beskrivelse
+	!   .................................................................
+	!   query       O    L(4)    Boolske svaret til spørsmålet
+	!   question    I    C(*)    Spørsmålet som blir skrive ut
+	!
+	!     I N T E R N E   V A R I A B L E :
+	!       Ingen
+	!
+	!   Programmert av: Kevin Robert Stravers
+	!   Date/Version  : 2016.04.28 / 1.0
+	!
+	! **********************************************************************
+	!
+
 	logical(4) function queryBool(question)
 		implicit none
 		character(len=*), intent(in) :: question
