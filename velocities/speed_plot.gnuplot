@@ -1,29 +1,16 @@
 reset
 
-# wxt
-# set terminal png size 350,262 enhanced font 'Verdana,10' persist
-# png
 set terminal pngcairo size 2000,2000 enhanced font 'Verdana,10'
 set output filename.".png"
 
-#unset key
-#unset tics
-#unset colorbox
 set border 0
 set grid
 
-#set palette defined ( \
-#0 '#ffffff', \
-#1 '#ffee00',\
-#2 '#ff7000',\
-#3 '#ee0000',\
-#4 '#7f0000')
 set palette rgbformulae 33,13,10
 
 set xrange [-0.1:1.1]
 set yrange [-0.1:1.1]
 set cbrange [0:1]
-#set xzeroaxis
 
 h = 0.1
 xf(phi) = h*cos(phi)

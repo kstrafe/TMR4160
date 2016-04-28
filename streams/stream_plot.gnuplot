@@ -1,6 +1,3 @@
-#set terminal pngcairo size 2000,2000 enhanced font 'Verdana,10'
-#set output filename.".png"
-
 reset
 set terminal pngcairo size 2000,2000 enhanced font 'Verdana,10'
 set output filename.".png"
@@ -21,4 +18,3 @@ set label "n: ".n at graph 0.8,0.05 center font "Verdana,24"
 set label "ideal dt: ".ideal_dt at graph 0.8,0.02 center font "Verdana,24"
 
 p filename.".image" with image
-# , 'cont.dat' w l lt -1 lw 1.5
