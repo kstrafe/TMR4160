@@ -1,0 +1,210 @@
+\documentclass{report}
+\usepackage[utf8]{inputenc}
+\usepackage[a4paper, total={7in, 10in}]{geometry}
+\usepackage{breqn}
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{caption}
+
+\title{TMR4160 Report}
+\author{Kevin Robert Stravers}
+\date{April 28th, 2016}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\chapter{Introduction}
+\section{Preliminaries}
+This report documents the process of creating a CFD solver on the UNIX platform using various tools. The solver is coded in \emph{Fortran 2008}. Graph drawing is the responsibility of \emph{gnuplot}. Video creation is done by \emph{avconv} (formerly \emph{ffmpeg}). The glue language used is \emph{bash 4}, together with \emph{awk}. \emph{make} is used as an extra supplement to make building easy. Online tools used are \emph{sharelatex} and \emph{github}. \emph{Sharelatex} allows one to write latex and compile it online. \emph{github} allows one to put his code online. This particular codebase is currently encrypted inside a \emph{tar.gz} such that nobody can access it except the maintainer. \emph{rsync} is used to store backups on a site-local server. \emph{Git} is used for version control. \emph{tar} and \emph{gpg} are used for packaging and encrypting respectively.
+
+The structure of the report explores each tool, as well as the development within that tool and other utilities used to solve a scientific task on UNIX.
+
+In preparation of this course I've taken the liberty to enroll in TEP4280, which is the introductory computational fluid dynamics course taught at NTNU. I've also learned a significant amount of bash, awk, and various command line tools commonly found on the GNU operating system. My editor of choice is \emph{vim}. \emph{Emacs} has been experimented with.
+
+The reason for choosing this project out of the available three is because I have never done any practical programming in \emph{Fortran}. \emph{Fortran 2008} was chosen because it is currently the most modern revision of the language.
+
+\section{Problem}
+The following segment describes the problem.
+
+A duct with constant flow from the left to the right, with borders at the top and bottom, contains a square in the middle. Compute the velocity, pressure, and streamlines at each point in time. \\
+
+\begin{center}
+\includegraphics[width=3in]{boundary_condition.png}
+\end{center}
+
+
+\chapter{Technicalities}
+\section{OS Selection}
+POSIX as (nearly completely) realized on the GNU system using a Linux kernel has many different distros (distributions). The chosen distribution became \emph{Linux Mint 17.3}, with the \emph{Cinnamon} desktop. This comes pre-installed with \emph{bash}, which is the glue language. The OS provides us with IPC (Inter-Process Communication) channels realized as fifo pipes and stdin/stdout redirections.
+
+The other tools need to be installed manually.
+
+\section{Installing The Tools}
+The tools are all installed using $apt$ - the builtin package manager for this distribution.
+
+\begin{verbatim}
+# apt-get install libav-tools  # For avconv
+# apt-get install gfortran-4.8  # For Fortran 2008
+# apt-get install gnuplot  # For gnuplot
+# apt-get install build-essential  # For make
+# apt-get install gawk  # For GNU awk
+# apt-get install git  # For git
+\end{verbatim}
+
+\section{Fortran 2008: Navier-Stokes Solving}
+The file \emph{sola.m} was provided as the starting point for solving the incompressible Navier-Stokes equation in two dimensions.
+I utilized \begin{verbatim} https://youtu.be/RSncu1io0VA [Demo Lecture: Navier-Stokes Solver, SOLA] \end{verbatim} to supplement my understanding of the algorithm.
+
+First I copied the matlab code into Fortran. Because I did not find any \emph{interp1} function, I had to code that myself. The drawing code from Matlab was ignored in Fortran.
+
+The boundary conditions had to be implemented. Using the knowledge gained from the demo lecture, one can see that parallel flow along a line requires an equal flow in the opposite direction on the other side of the boundary. For perpendicular flow, the flow variable is simply set to zero. In addition to the boundary conditions, flow from the sides must be created. A flow on the left side of value $0.1$, in addition to the right side are added to the code.
+Using values larger than $0.1$ sometimes gave NaN values, depending on the Reynolds number. An upper limit is reached aroung $0.5$. I decided to keep it at $0.1$ to give the algorithm some flexibility.
+
+\begin{verbatim}
+! Venstre og høyre kant av boksen
+do j = bottom, top
+u(left,j) = 0.0;
+v(left,j) = -v(left+1,j);
+u(right,j) = 0.0;
+v(right+1,j) = -v(right,j);
+enddo
+\end{verbatim}
+
+We now have all pressures, streams, and velocities at each time state. The states and positions are normalized into a $[0, 1]$ range and printed line-by-line to a the standard output. Pressures, streams, and velocities are bulk printed, and each bulk is headed by a header that denotes what the data means.
+
+\begin{verbatim}
+# BEGIN VECTOR FIELD
+# Various data here
+3.33333351E-02   3.33333351E-02 -0.78359460856846219       0.49428533784506190
+...
+# END VECTOR FIELD
+\end{verbatim}
+
+For vector fields (velocities), the first two numbers are the spatial coordinates. The third is the angle at which the arrow will point, and the last value is the speed compared to all other points. If the last number of the line is 1, it means that this point has the highest velocity. If it is 0, then this point has the lowest velocity.
+
+Similar annotations are implemented for pressures and streams. These have no angle. They only use a single value from zero to one.
+
+\begin{verbatim}
+# BEGIN PRESSURE FIELD
+# MAX VALUE 0.318
+# MIN VALUE -0.321
+# TIME 0.3499999
+0.866666675      0.800000012      0.13296376029139553
+...
+# END PRESSURE FIELD
+\end{verbatim}
+
+Here the first two values are the coordinate, whereas the last value denotes the pressure relative to other pressures in that timeframe. Again, the highest pressure is a 1, whilst the lowest is 0. The reason for doing this is that it allows the drawings to come out cleanly without spurious numbers. Frame-dependent maxima and minima, as well as the current time are provided in each frame. This allows each picture to be stamped with useful values. The max and min values can be used against the color code of a specific point on the graph to linearly interpolate the true value pressure of that point. Streams have the same representation as the pressure field.
+
+\section{Awk: Processing Data}
+\emph{Awk} is chosen for processing the data since the data is tabular. Awk is also battle-tested by the industry as well as being efficient.
+The exemplary modus operandi is when a \emph{\# BEGIN PRESSURE FIELD} tag is found, awk changes state and prints all lines after it. When the corresponding end tag is found, it sets a variable to no longer print. For every end tag, a counter increments. For every begin tag, a counter is printed such that other processing programs can separate frames.
+
+The output of awk is piped into a new file. Another awk script separates each frame and puts it into a 'number.image' file. Where number denotes the current frame.
+
+\begin{verbatim}
+#! /usr/bin/awk -f
+
+BEGIN { number = 0; }
+/# Frame/ {
+number += 1;
+}
+// {
+print $0 > number".image";
+}
+\end{verbatim}
+
+Other uses for awk were to simply gather data from the output file. Data such as the Reynolds number and time step were useful to display. I considered it too bothersome to use Fortran's file API. The stdout and awk method is universal and scales well. Awk exits after finding a matching line. Since these matching lines are at the top of the file, the runtime of awk can be considered constant here.
+
+Awk is also used to retrieve the \emph{MAX VALUE}, \emph{MIN VALUE}, and \emph{TIME} values from each frame. This is where awk fits naturally considering that it splits tabular data on spaces. The data is easily retrieved using a tiny script.
+
+\begin{verbatim}
+#! /usr/bin/awk -f
+
+/# MAX VALUE/ {
+print $4;
+exit 0;
+}
+\end{verbatim}
+
+
+\section{GnuPlot: Drawing Images}
+$GnuPlot$ is invoked for each 'number.image' file, which generates a corresponding 'number.png' file. Plotting is run in parallel as to speed it up. Bash is used to put all variables in place for gnuplot to use. It extracts - via awk - the time, Reynolds number, time step, ideal time step, the ending time, the maximal and minimal values, and the mesh size. In addition to this, bash is used to iterate the frames. It also gives gnuplot the correct frame number. Gnuplot draws the image to the given frame number and appends a '.png' extension. After drawing is done, all images get the same filename length by prepending eight numbers, padded by zeros. Each picture is 2000x2000 pixels.
+
+The plotting script is unique to what is being plotted. The vectors are plotted in a different manner compared to the pressure and stream plots. Plots are given a zero-to-one grid such that video frames line up.
+
+\section{AvConv: Generating Video}
+A single avconv command reads each png file and turns it into a video file. The video can now be displayed using any compatible media player (h264 encoded video). Threading is added for faster processing. The avconv command outputs a '.mov' file. This is a large file because it retains the high quality of the pictures. Compressing to '.webm' format can easily take the size lower than 3 MB, but the quality suffers.
+
+\begin{verbatim}
+avconv -threads 4 -framerate 25 -f image2 -i %08d.png -c:v h264 -crf 1 out.mov
+\end{verbatim}
+
+A thread count of $4$ was chosen because this process runs three times in parallel (for each of the three plots). This means that a total of twelve threads are spawned. A rule for $n$ cores is to optimally use $\frac{3}{2} n$ threads due to time slicing and context switching. This rule is not empirically verified nor any scientific guideline.
+
+\section{Make}
+A simple makefile is used to preprocess the Fortran file. It removes leading tabs and replaces them with spaces.
+
+\begin{verbatim}
+all:
+cat main.f | sed 's/\t/  /g' > main2.f
+gfortran -std=f2008 -Wextra -Wall -Wtabs -ffree-form -pedantic main2.f -o nstokes 2>&1
+
+run:
+$(MAKE) all
+./nstokes
+\end{verbatim}
+
+\section{Bash: The Glue}
+A single bash file runs every single task. This bash file is called after make finishes compiling. It runs the 'nstokes' file using predetermined input and generates all videos, finally showing them to the viewer in 'vlc' media player.
+
+\chapter{Discussion}
+Sometimes the Fortran code would diverge slightly when given wrong inputs. Values of 'NaN' are both occurring in the matlab as well as the Fortran script. I suspect this to be the result of an indeterminate form calculation, especially where an infinity is multiplied by a zero. This can come about due to an instability in the numerical method, which the script warns us about.
+
+I was unable to repeat the drawing of the stream function. This requires one to follow the closest points to an established stream line. Due to the nature of iteration over the field, this would be a difficult task which I don't know the algorithm for.
+
+The pressure and velocity field were easier to draw.
+
+The 'makefile' translates the 'main.f' using 'sed' into a 'main2.f' file. The reasons for doing this is to avoid the warning of using tabs as indentation. Fortran does not like tabs for indenting because it gives warnings. This solves that problem. It is not an idiomatic solution. I could also change my editor's indents to be spaces, but this would incur a loss of consistency among all pieces of code where tabs are used. No issues or were found that would collide with Fortran's lexer when removing leading tabs.
+
+\section{Space Usage}
+Each stage stores some intermediate data on the disk. Most of the data is located in the 'output' file. This file ranges from 20-400 MB in size. The image files are around 80 KB. The pictures (png) files are often around 100 KB. The final video tends to be around 5-30 MB. This video can be compressed to webm, decreasing its size to 2 MB. The awked files (streams, pressures, velocities) are approximately 50 MB.
+
+\begin{verbatim}
+184M	output
+178M	pressures/
+178M	streams/
+870M	velocities/
+\end{verbatim}
+
+The large size of 'velocities' is due to the relative incompressibility of the arrows in the images. This makes the images around ten times as large as the ones in pressures and streams. The same is true of the video file.
+
+\section{Processing Time}
+On my Intel i7-3630QM machine, utilizing all cores for image generation in gnuplot takes the most time. About a full second per image, depending on data points and resolution. Running the awk scripts takes negligible amounts of time. The solver itself can consume a large amount of time if the data points are above 50 and the time intervals lower than $10^3$. The fortran compiler is remarkably fast, finishing within a second. Future revisions of the Navier-Stokes solver could use parallelization in addition to an adaptive K-d Tree for a variable-sized mesh.
+\begin{verbatim}
+real 4m27.598s
+\end{verbatim} is the running time for the entire toolchain using standard input values.
+
+\chapter{Conclusion}
+\section{Overall Experience}
+My prior coding knowledge made the project easy to conceptualize and manage. I did have to learn Fortran and gnuplot. These tools I've never used before. Most time of the project time was spent learning Fortran and gnuplot. The bash and awk scripts were easy to put together. The architecture of the project did not require much thought, as the separation of concerns was so high that there was no need for object oriented programming or multi-file fortran code.
+
+\section{Refactoring}
+I eventually got code duplication in the 'tovideo.sh' and 'generate_plots.sh' files for each plot (velocity, pressure, stream), that the code was refactored into a single file. Refactoring also occurred in the Fortran code. Querying functions were created to avoid repetitive writing. I started out thinking they should be in functions, but I've learned that one should let the code specialize at first, and only later collect patterns in functions. I tried over-generalizing functions, but that just becomes very difficult to work with.
+
+\section{Results}
+The values printed by the algorithm can be compared to the matlab code. The speeds match the matlab code. I've chosen to use 'REAL(8)' because matlab defaults to double precision floating point numbers. The results can be viewed by opening the respective '*.mov' files in the folders 'streams', 'velocities', and 'pressures'. This file is encoded in the h264 video format. 'vlc' is able to play this format. One can adjust the Reynolds numbers and observe local vortices being creates. A large Reynolds number will show completely turbulent flow. This is in agreement with the general idea of how flow behind a solid body is shaped due to Reynolds numbers.
+
+To run the code:
+\begin{verbatim} ./everything n Re dt tmax skip' \end{verbatim}, where the variables need to be numbers. $n$ is the grid size. $Re$ the Reynolds number. $dt$ the time step. $tmax$ the end time. If you anticipate a warning, you can write 'y' for skip, this will skip the warning if the time step is above the ideal time step. The solver can also be run manually by writing './nstokes', but this will not run the scripts that generate the videos. To generate the videos, you need to pipe the nstokes output into the 'output' file: './nstokes > output'.
+
+\begin{verbatim} ./everything n Re dt tmax skip \end{verbatim} stores the given values in the file 'input'. If 'everything' is run without any input, then it defaults to the last input given.
+
+\chapter{Code}
+TODO: Link in code
+
+\end{document}
