@@ -42,11 +42,7 @@ program navier
 	real(8) :: max_streamline, min_streamline, current_stream
 
 	! Få grid størrelsen
-	print *, '# Enter n (0 will default to 30): '
-	read(*,*) n
-	if (n == 0) then
-		n = 30
-	endif
+	n = int(query('# Enter n (0 will default to 30): ', dble(30), epsi))
 
 	! Alloker minne til strømfunksjonens verdier
 	allocate(psi(n+1,n+1))
@@ -66,25 +62,13 @@ program navier
 	p = u
 
 	! Få reynolds tallet i strømningen
-	print *, '# Enter Re (0 will default to 100): '
-	read(*,*) Re
-	if (Re < epsi) then
-		Re = 100
-	endif
+	Re = query('# Enter Re (0 will default to 100): ', dble(100), epsi)
 
 	! Få ut tidsskrittet
-	print *, '# Enter dt (0 will default to 0.01): '
-	read(*,*) dt
-	if (dt < epsi) then
-		dt = 0.01
-	endif
+	dt = query('# Enter dt (0 will default to 0.01): ', dble(0.01), epsi)
 
 	! Få ut den endelige tiden
-	print *, '# Enter tmax (0 will default to 10): '
-	read(*,*) tmax
-	if (tmax < epsi) then
-		tmax = 10.0
-	endif
+	tmax = query('# Enter tmax (0 will default to 10): ', dble(10), epsi)
 
 	! Beregn stabilitetsverdier
 	omega = interp1(nn, cc, dble(n), 9)
@@ -482,5 +466,15 @@ contains
 		isNan = a /= a
 	end
 
+	real(8) function query(question, defaulting, epsi)
+		implicit none
+		character(len=*), intent(in) :: question
+		real(8), intent(in) :: defaulting, epsi
+		print *, question
+		read (*,*) query
+		if (query < epsi) then
+			query = defaulting
+		endif
+	end
 
 end program
