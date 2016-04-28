@@ -20,7 +20,13 @@ set output filename.".png"
 reset
 set xrange [-0.1:1.1]
 set yrange [-0.1:1.1]
-unset key
+#set grid ytics mytics xtics mxtics
+#set style fill solid
+#set ytics 1.0/(n-1)
+#set xtics 1.0/(n-1)
+#set grid front
+#set grid
+#unset key
 set palette rgbformulae 33,13,10
 set label "dt: ".dt at graph 0.2,0.98 center font "Verdana,24"
 set label "Max Pressure: ".max_val at graph 0.5,0.98 center font "Verdana,24"
