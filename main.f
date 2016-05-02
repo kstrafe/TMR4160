@@ -7,6 +7,9 @@ program navier
 	! kompilator feil
 	real(8) :: Re, dt, tmax
 
+	! Hvor stor den horisontale strømmen gjennom kanalen er
+	real(8) :: flow
+
 	! Variabler til stabilitets beregning
 	real(8) :: h, beta, ideal, omega
 	real(8), dimension(9) :: nn = [0, 5, 10, 20, 30, 40, 60, 100, 500]
@@ -44,6 +47,8 @@ program navier
 	integer, allocatable :: block_x_start(:), block_y_start(:), block_x_stop(:), block_y_stop(:)
 
 	do while (keep_looping)
+		flow = query('# Enter flow (0 will default to 0.1): ', dble(0.1), epsi)
+
 		! Få grid størrelsen
 		n = int(query('# Enter n (0 will default to 30): ', dble(30), epsi))
 
@@ -139,9 +144,9 @@ program navier
 		do iter = 1, itmax
 			! Venstre og høyre rand
 			do j = 1, n+2
-				u(1,j) = 0.01
+				u(1,j) = flow
 				v(1,j) = -v(2,j)
-				u(n+1,j) = 0.01
+				u(n+1,j) = flow
 				v(n+2,j) = -v(n+1,j)
 			enddo
 			! Topp og bunn rand
