@@ -139,9 +139,9 @@ program navier
 		do iter = 1, itmax
 			! Venstre og høyre rand
 			do j = 1, n+2
-				u(1,j) = 0.1
+				u(1,j) = 0.01
 				v(1,j) = -v(2,j)
-				u(n+1,j) = 0.1
+				u(n+1,j) = 0.01
 				v(n+2,j) = -v(n+1,j)
 			enddo
 			! Topp og bunn rand

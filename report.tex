@@ -118,7 +118,7 @@ I utilized \begin{verbatim} https://youtu.be/RSncu1io0VA [Demo Lecture: Navier-S
 First I copied the matlab code into Fortran. Because I did not find any \emph{interp1} function, I had to code that myself. The drawing code from Matlab was ignored in Fortran.
 
 The boundary conditions had to be implemented. Using the knowledge gained from the demo lecture, one can see that parallel flow along a line requires an equal flow in the opposite direction on the other side of the boundary. For perpendicular flow, the flow variable is simply set to zero. In addition to the boundary conditions, flow from the sides must be created. A flow on the left side of value $0.1$, in addition to the right side are added to the code.
-Using values larger than $0.1$ sometimes gave NaN values, depending on the Reynolds number. An upper limit is reached aroung $0.5$. I decided to keep it at $0.1$ to give the algorithm some flexibility.
+Using values larger than $0.1$ sometimes gave NaN values, depending on the Reynolds number. An upper limit is reached aroung $0.5$. I decided to keep it at $0.01$ to give the algorithm some flexibility. Higher values can cause NaN to pop up (especially with tight boundary conditions).
 
 \begin{verbatim}
 syscmd(`./getcode.sh main.f 154 175')
