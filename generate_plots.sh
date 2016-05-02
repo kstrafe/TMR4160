@@ -1,5 +1,7 @@
 #! /bin/bash
 
+# Generer plots ved hjelp av gnuplot.
+
 if [ $(ls *.png 2>/dev/null | wc -l) -gt 0 ]; then rm *.png; fi
 
 . ../get_values.sh

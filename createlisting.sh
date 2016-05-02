@@ -1,5 +1,6 @@
 #! /bin/bash
 
+# Genererer LaTeX listing slik at alt av den inkluderte koden blir autogenerert
 interpolate() {
 	caption=$(echo $1 | sed 's/\_/\\_/g')
 	echo "\\lstinputlisting[caption={${caption##./}},breaklines=true,frame=single,language="$2"]{"$3"}"

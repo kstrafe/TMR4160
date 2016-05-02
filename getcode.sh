@@ -1,5 +1,7 @@
 #! /bin/sh
 
+# Hent spesifikke linjer fra en fil
+
 filename=$1
 begin_line=$2
 end_line=$3

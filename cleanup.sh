@@ -1,5 +1,8 @@
 #! /bin/bash
 
+# Fjerne alle midlertidige filer som er generert av ulike skript.
+# Kjører cleanup rekursivt
+
 rm output 2>/dev/null
 for folder in *; do
 	if [ -d "$folder" ]; then
