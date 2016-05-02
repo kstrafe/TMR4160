@@ -121,7 +121,7 @@ The boundary conditions had to be implemented. Using the knowledge gained from t
 Using values larger than $0.1$ sometimes gave NaN values, depending on the Reynolds number. An upper limit is reached aroung $0.5$. I decided to keep it at $0.1$ to give the algorithm some flexibility.
 
 \begin{verbatim}
-syscmd(`./getcode.sh main.f 120 149')
+syscmd(`./getcode.sh main.f 154 175')
 \end{verbatim}
 
 We now have all pressures, streams, and velocities at each time state. The states and positions are normalized into a $[0, 1]$ range and printed line-by-line to a the standard output. Pressures, streams, and velocities are bulk printed, and each bulk is headed by a header that denotes what the data means.
@@ -227,7 +227,7 @@ real 4m27.598s
 My prior coding knowledge made the project easy to conceptualize and manage. I did have to learn Fortran and gnuplot. These tools I've never used before. Most time of the project time was spent learning Fortran and gnuplot. The bash and awk scripts were easy to put together. The architecture of the project did not require much thought, as the separation of concerns was so high that there was no need for object oriented programming or multi-file fortran code.
 
 \section{Refactoring}
-I eventually got code duplication in the 'tovideo.sh' and 'generate_plots.sh' files for each plot (velocity, pressure, stream), that the code was refactored into a single file. Refactoring also occurred in the Fortran code. Querying functions were created to avoid repetitive writing. I started out thinking they should be in functions, but I've learned that one should let the code specialize at first, and only later collect patterns in functions. I tried over-generalizing functions, but that just becomes very difficult to work with.
+I eventually got code duplication in the 'tovideo.sh' and 'generate\textunderscore plots.sh' files for each plot (velocity, pressure, stream), that the code was refactored into a single file. Refactoring also occurred in the Fortran code. Querying functions were created to avoid repetitive writing. I started out thinking they should be in functions, but I've learned that one should let the code specialize at first, and only later collect patterns in functions. I tried over-generalizing functions, but that just becomes very difficult to work with.
 
 \section{Results}
 The values printed by the algorithm can be compared to the matlab code. The speeds match the matlab code. I've chosen to use 'REAL(8)' because matlab defaults to double precision floating point numbers. The results can be viewed by opening the respective '*.mov' files in the folders 'streams', 'velocities', and 'pressures'. This file is encoded in the h264 video format. 'vlc' is able to play this format. One can adjust the Reynolds numbers and observe local vortices being creates. A large Reynolds number will show completely turbulent flow. This is in agreement with the general idea of how flow behind a solid body is shaped due to Reynolds numbers.
