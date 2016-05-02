@@ -536,14 +536,14 @@ contains
 		real(8) :: min_speed, max_speed, angle, current_speed
 
 		min_speed = sqrt(((v(2,1)+v(2,2))/2)**2 + ((u(1,2)+u(2,2))/2)**2)
-		do i = 2, n
+		do i = 1, n
 			do j = 1, n
 				min_speed = min(sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2), min_speed)
 			enddo
 		enddo
 		! Beregn største hastighet for denne framen
 		max_speed = sqrt(((v(2,1)+v(2,2))/2)**2 + ((u(1,2)+u(2,2))/2)**2)-min_speed
-		do i = 2, n
+		do i = 1, n
 			do j = 1, n
 				max_speed = max(sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2)-min_speed, max_speed)
 			enddo
@@ -558,7 +558,7 @@ contains
 			do j = 1, n
 				current_speed = sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2) / max_speed
 				angle = atan2((v(i+1,j)+v(i+1,j+1))/2, (u(i,j+1)+u(i+1,j+1))/2)
-				print *, real(i-1)/(n-1), real(j-1)/(n-1), angle, current_speed
+				print *, real(i-1)/n, real(j-1)/n, angle, current_speed
 				if (isNan(angle)) then
 					stop 2
 				endif
