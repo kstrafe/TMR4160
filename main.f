@@ -558,7 +558,7 @@ contains
 			do j = 1, n
 				current_speed = sqrt(((v(i+1,j)+v(i+1,j+1))/2)**2 + ((u(i,j+1)+u(i+1,j+1))/2)**2) / max_speed
 				angle = atan2((v(i+1,j)+v(i+1,j+1))/2, (u(i,j+1)+u(i+1,j+1))/2)
-				print *, real(i-1)/n, real(j-1)/n, angle, current_speed
+				print *, real(i-1)/(n-1), real(j-1)/(n-1), angle, current_speed
 				if (isNan(angle)) then
 					stop 2
 				endif
