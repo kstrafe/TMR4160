@@ -15,8 +15,8 @@ program navier
 	! Iterator hjelpere til time steppet
 	real(8) :: t, div, delp
 
-	! Iteratorer
-	integer :: i, j, iter
+	! Iteratorers
+	integer :: i, j, iter, b
 
 	! Maks verdi på iterasjonen og feil endings flagget
 	integer :: itmax = 300, iflag = 0
@@ -25,7 +25,7 @@ program navier
 	integer :: n
 
 	! Indeksene for boksen som står i strømmen
-	integer :: top, bottom, left, right, height
+	integer :: top, bottom, left, right
 
 	! Maskin epsilon
 	real(8), parameter :: epsi = 1e-6
@@ -39,6 +39,10 @@ program navier
 	! Om vi skal spørre igjen
 	logical(4) :: keep_looping = .true.
 
+	! Dude
+	integer :: blocked
+	integer, allocatable :: block_x_start(:), block_y_start(:), block_x_stop(:), block_y_stop(:)
+
 	do while (keep_looping)
 		! Få grid størrelsen
 		n = int(query('# Enter n (0 will default to 30): ', dble(30), epsi))
@@ -46,13 +50,6 @@ program navier
 		! Alloker minne til strømfunksjonens verdier
 		allocate(psi(n+1,n+1))
 		psi = 0
-
-		! Beregn grensene til boksen
-		bottom = int(dble(n+2)/4 + dble(n+2)/8);
-		height = int((n+2)/4);
-		top = bottom + height;
-		left = bottom;
-		right = top;
 
 		! Opprett hastighetsfelt og trykkfelt
 		allocate(u(n+2,n+2))
@@ -88,6 +85,28 @@ program navier
 		endif
 		keep_looping = .false.
 	enddo
+
+	blocked = int(query('# Enter the amount of blockers: ', dble(0), epsi))
+	allocate(block_x_start(blocked))
+	allocate(block_y_start(blocked))
+	allocate(block_x_stop(blocked))
+	allocate(block_y_stop(blocked))
+
+	do i = 1, blocked
+		block_x_start(i) = int(query('# Enter the starting x coordinate of the block: ', dble(1), epsi))
+		block_x_stop(i) = int(query('# Enter the stopping x coordinate of the block: ', dble(1), epsi))
+		block_y_start(i) = int(query('# Enter the starting y coordinate of the block: ', dble(1), epsi))
+		block_y_stop(i) = int(query('# Enter the stopping y coordinate of the block: ', dble(1), epsi))
+		if (max(block_x_start(i), block_x_stop(i), block_y_start(i), block_y_stop(i), n) /= n) then
+			print *, '# Error: boundary condition outside of the grid size (> n). Aborting.'
+			stop 2
+		endif
+		if (min(block_x_start(i), block_x_stop(i), block_y_start(i), block_y_stop(i), 0) /= 0) then
+			print *, '# Error: boundary condition outside of the grid size (negative). Aborting.'
+			stop 2
+		endif
+	enddo
+
 
 	print *, '# Re', Re
 	print *, '# dt', dt
@@ -133,19 +152,26 @@ program navier
 				u(i,1) = -u(i,2)
 			enddo
 
-			! Venstre og høyre kant av boksen
-			do j = bottom, top
-				u(left,j)=0.0;
-				v(left,j)=-v(left+1,j);
-				u(right,j)=0.0;
-				v(right+1,j)=-v(right,j);
-			enddo
-			! Topp og bunnpunkt av boksen
-			do i = left, right
-				v(i,top)=0.0;
-				v(i,bottom)=0.0;
-				u(i,top+1)=-u(i,top);
-				u(i,bottom)=-u(i,bottom+1);
+			do b = 1, blocked
+				left = block_x_start(b)
+				right = block_x_stop(b)
+				top = block_y_stop(b)
+				bottom = block_y_start(b)
+
+				! Venstre og høyre kant av boksen
+				do j = bottom, top
+					u(left,j)=0.0;
+					v(left,j)=-v(left+1,j);
+					u(right,j)=0.0;
+					v(right+1,j)=-v(right,j);
+				enddo
+				! Topp og bunnpunkt av boksen
+				do i = left, right
+					v(i,top)=0.0;
+					v(i,bottom)=0.0;
+					u(i,top+1)=-u(i,top);
+					u(i,bottom)=-u(i,bottom+1);
+				enddo
 			enddo
 
 			! Sett ferdig flagget til null
