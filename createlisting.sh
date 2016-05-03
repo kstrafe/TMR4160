@@ -12,7 +12,7 @@ language_iter=0
 
 for extension in sh f m awk gnuplot; do
 	for filename in $(find -name '*.'"$extension"); do
-		if [ "$filename" != "./main2.f" ]; then
+		if [ "$filename" != "./temp/main2.f" ]; then
 			interpolate "$filename" "${language[$language_iter]}" "$filename"
 		fi
 	done
