@@ -127,3 +127,6 @@ psi=-psi';
 [C,H]=contour(psi);
 clabel(C)
 title(['Streamfunction \psi_{max}=',num2str(max(max(abs(psi))))])
+
+dlmwrite('temp/velocities_u', transpose(U));
+dlmwrite('temp/velocities_v', transpose(V));
