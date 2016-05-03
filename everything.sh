@@ -21,6 +21,8 @@ depend rm
 depend vlc
 depend wc
 
+mkdir temp
+
 trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 
 make
