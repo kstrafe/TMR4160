@@ -1,5 +1,7 @@
 #! /usr/bin/awk -f
 
+# Henter strømfunksjonen fra stdin og printer den til stdout
+
 BEGIN { on = 0; number = 0; }
 /# END STREAM LINE/ {
 	number += 1;

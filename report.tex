@@ -248,7 +248,16 @@ tmax = 10
 box = 12,20,12,20 (x0,x1,y0,y1)
 \end{verbatim}
 
-Running './everything' will compute the differences and put them in temp/differences. It can readily be observed that the absolute and relative errors are around four to six negative orders of magnitude. I suspect these errors to be due to the imperfect ending time in fortran (going to $10.009999$...), whereas matlab reports a time of exactly $10$.
+Running './everything' will compute the differences and put them in temp/differences. It can readily be observed that the absolute and relative errors are around four to six negative orders of magnitude. I suspect these errors to be due to the imperfect ending time in fortran (going to $10.009999$...), whereas matlab reports a time of exactly $10$. Comparing the images shows a clear similarity and direction of the vectors.
+
+\begin{center}
+\includegraphics[width=7in]{velocities/00001001.png}
+\end{center}
+\begin{center}
+\includegraphics[width=7in]{matlab_final.png}
+\end{center}
+
+The region of interest in these two graphs is in the middle, to the right. We can see two vectors overlapping each other. This gives us a clue as to how accurate the fortran code is compared to the matlab code.
 
 \chapter{Code}
 syscmd(`./createlisting.sh')

@@ -1,5 +1,7 @@
 #! /usr/bin/awk -f
 
+# Henter vektor feltet fra stdin og printer det til stdout
+
 BEGIN { on = 0; number = 0; }
 /# END VECTOR FIELD/ {
 	number += 1;
