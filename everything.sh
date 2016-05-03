@@ -1,6 +1,7 @@
 #! /bin/bash
 
-# Kjører hele simulasjonen med resultat videoer
+# Kjører hele simulasjonen med resultat videoer, og avviksberegning
+
 depend() {
 	command -v $1 >/dev/null 2>&1 || {
 		echo "This script requires $1, but it's not installed. Aborting." >&2
