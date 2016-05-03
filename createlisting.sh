@@ -16,6 +16,6 @@ for extension in sh f m awk gnuplot; do
 			interpolate "$filename" "${language[$language_iter]}" "$filename"
 		fi
 	done
-	$((++language_iter))
+	language_iter=$((language_iter+1))
 done
 interpolate makefile bash "makefile"

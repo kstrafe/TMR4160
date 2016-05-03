@@ -7,12 +7,12 @@
 trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 
 function move {
-	mv "$1"/out.mov temp/"${2#inputs/}"_"$1".mov
+	mv "$1"/out.mov generated/"${2#inputs/}"_"$1".mov
 }
 
 function moveLastImage {
 	last=$(echo "$1"/*.png | sort -h | rev | cut -d' ' -f 1 | rev)
-	mv "$last" temp/"${2#inputs/}"_"$1".png
+	mv "$last" generated/"${2#inputs/}"_"$1".png
 }
 
 for input in inputs/*; do
