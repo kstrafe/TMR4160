@@ -217,6 +217,9 @@ program navier
 
 	enddo
 
+	call printSpeedInMatrix(u, n, t, 'U')
+	call printSpeedInMatrix(v, n, t, 'V')
+
 contains
 
 	!   --------------------------------------------------------------------
@@ -726,6 +729,61 @@ contains
 			enddo
 		enddo
 		print *, '# END STREAM LINE'
+
+	end
+
+	!   --------------------------------------------------------------------
+	!     Subroutine                 printSpeedInMatrix             No.: 4
+	!   --------------------------------------------------------------------
+	!
+	!   Hensikt :
+	!   Printe ut hastighetsfeltet i matrise form, slik den er enkel å sammen-
+	!   ligne med matlab
+	!   Metode :
+	!   Gå gjennom matrisen og print hvert element  for seg. Hver rad separerer
+	!   en linje. Hver kolonne er komma separert
+	!
+	!   Kall sekvens .......................................................
+	!
+	!    printSpeedInMatrix(u, n, t, field_name)
+	!
+	!   Parametre:
+	!   Navn        I/O  Type     Innhold/Beskrivelse
+	!   .................................................................
+	!   u           I    R(:,:)   Hastighet i en vilkårlig retning
+	!   n           I    I        Størrelsen på u (kantene)
+	!   t           I    R(8)     Tiden nå (dette tidspunktet)
+	!   field_name  I    C(*)     Navnet på feltet, brukt til å merke utputt
+	!
+	!     I N T E R N E   V A R I A B L E :
+	!       formatter          Brukes til å formattere utputt
+	!
+	!   Programmert av: Kevin Robert Stravers
+	!   Date/Version  : 2016.05.03 / 1.0
+	!
+	! **********************************************************************
+	!
+	subroutine printSpeedInMatrix(u, n, t, field_name)
+		! Print ut verdiene for hastighetsmatrisene
+		implicit none
+		real(8), allocatable, intent(in) :: u(:,:)
+		integer, intent(in) :: n
+		real(8), intent(in) :: t
+		character(len=*), intent(in) :: field_name
+		character(len=*), parameter :: formatter = "(E15.6E3)"
+
+		! Print ut vektor feltet
+		print *, '# BEGIN VELOCITY ' // field_name
+		print *, '# TIME', t
+		do i = 1, n
+			write(*,formatter,advance='no') (u(i,2)+u(i+1,2))/2
+			do j = 2, n
+				write(*,"(A)",advance='no') ','
+				write(*,formatter,advance='no') (u(i,j+1)+u(i+1,j+1))/2
+			enddo
+			print *,
+		enddo
+		print *, '# END VELOCITY ' // field_name
 
 	end
 
