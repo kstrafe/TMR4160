@@ -768,7 +768,7 @@ contains
 		real(8), allocatable, intent(in) :: u(:,:), v(:,:)
 		integer, intent(in) :: n
 		real(8), intent(in) :: t
-		character(len=*), parameter :: formatter = "(E15.6E3)"
+		character(len=*), parameter :: formatter = "(F20.12)"
 
 		! Print ut vektor feltet
 		print *, '# BEGIN VELOCITY U'

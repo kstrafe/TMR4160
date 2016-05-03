@@ -236,6 +236,19 @@ To run the code:
 \begin{verbatim} ./everything n Re dt tmax skip boundaries $boundaries \end{verbatim}, where the variables need to be numbers. $n$ is the grid size. $Re$ the Reynolds number. $dt$ the time step. $tmax$ the end time. If you anticipate a warning, you can write 'y' for skip, this will skip the warning if the time step is above the ideal time step. $boundaries$ are the number of boxes. $\$boundaries$ are the actual boxes given as x0 y0 x1 y1 (line-separated). The solver can also be run manually by writing './nstokes', but this will not run the scripts that generate the videos. To generate the videos, you need to pipe the nstokes output into the 'output' file: './nstokes > output'.
 \begin{verbatim} ./everything n Re dt tmax skip boundaries $boundaries \end{verbatim} stores the given values in the file 'input'. If 'everything' is run without any input, then it defaults to the last input given.
 
+\subsection{Correctness}
+To show that the results are correct, the matlab script is taken to be the reference implementation of the code. I've taken the liberty to tweak the matlab script to only include the boundary conditions. The values that both tests run under:
+
+\begin{verbatim}
+flow = 0.1
+n = 30
+Re = 3000
+dt = 0.01
+tmax = 10
+box = 12,20,12,20 (x0,x1,y0,y1)
+\end{verbatim}
+
+
 \chapter{Code}
 syscmd(`./createlisting.sh')
 

@@ -57,4 +57,12 @@ done
 
 cd ..
 
+printf '%s' "Do you want to compare the velocities with matlab 12-20-12-20 result? (y/n) (n):"
+read ans
+if [ "$ans" = "y" ]; then
+	echo Computing differences with conventional 12-20-12-20 matlab answer
+	./matrix_to_image.awk output
+	./compare
+fi
+
 vlc $(find -name '*.mov')

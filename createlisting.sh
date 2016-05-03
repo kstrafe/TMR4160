@@ -13,3 +13,4 @@ for extension in sh f m awk gnuplot; do
 		fi
 	done
 done
+interpolate makefile bash "makefile"
