@@ -29,7 +29,7 @@
 
 \chapter{Introduction}
 \section{Preliminaries}
-This report documents the process of creating a CFD solver on the UNIX platform using various tools. The solver is coded in \emph{Fortran 2008}. Graph drawing is the responsibility of \emph{gnuplot}. Video creation is done by \emph{avconv} (formerly \emph{ffmpeg}). The glue language used is \emph{bash 4}, together with \emph{awk}. \emph{make} is used as an extra supplement to make building easy. Online tools used are \emph{sharelatex} and \emph{github}. \emph{Sharelatex} allows one to write latex and compile it online. \emph{github} allows one to put his code online. This particular codebase is currently encrypted inside a \emph{tar.gz} such that nobody can access it except the maintainer. \emph{rsync} is used to store backups on a site-local server. \emph{Git} is used for version control. \emph{tar} and \emph{gpg} are used for packaging and encrypting respectively.
+This report documents the process of creating a CFD solver on the UNIX platform using various tools. The solver is coded in \emph{Fortran 2008}. Graph drawing is the responsibility of \emph{gnuplot}. Video creation is done by \emph{avconv} (formerly \emph{ffmpeg}). The glue language used is \emph{bash 4}, together with \emph{awk}. \emph{make} is used as an extra supplement to make building easy. Online tools used are \emph{sharelatex} and \emph{github}. \emph{Sharelatex} allows one to write latex and compile it online. \emph{github} allows one to put his code online. This particular code base is currently encrypted inside a \emph{tar.gz} such that nobody can access it except the maintainer. \emph{rsync} is used to store backups on a site-local server. \emph{Git} is used for version control. \emph{tar} and \emph{gpg} are used for packaging and encrypting respectively.
 
 The structure of the report explores each tool, as well as the development within that tool and other utilities used to solve a scientific task on UNIX.
 
@@ -48,7 +48,7 @@ A duct with constant flow from the left to the right, with borders at the top an
 
 \chapter{Theory}
 \section{Navier-Stokes}
-The Navier-Stokes equations are solved by the method implemented in \emph{sola.m} file. The equations to be solved are the laplace equation and the Navier-Stokes equation in two dimensions.
+The Navier-Stokes equations are solved by the method implemented in \emph{sola.m} file. The equations to be solved are the Laplace equation and the Navier-Stokes equation in two dimensions.
 
 $$ \nabla^2 \cdot \vec{v} = 0 $$
 $$ \frac{\partial \vec{v}}{\partial t} + (\vec{v} \cdot \nabla) \vec{v} = -\frac{1}{\rho} \nabla p^{n+1} + \mu \nabla^2 \vec{v}^n $$
@@ -95,12 +95,12 @@ This is what the algorithm attempts to solve.
 
 \chapter{Technicalities}
 \section{OS Selection}
-POSIX as (nearly completely) realized on the GNU system using a Linux kernel has many different distros (distributions). The chosen distribution became \emph{Linux Mint 17.3}, with the \emph{Cinnamon} desktop. This comes pre-installed with \emph{bash}, which is the glue language. The OS provides us with IPC (Inter-Process Communication) channels realized as fifo pipes and stdin/stdout redirections.
+POSIX as (nearly completely) realized on the GNU system using a Linux kernel has many different distros (distributions). The chosen distribution became \emph{Linux Mint 17.3}, with the \emph{Cinnamon} desktop. This comes pre-installed with \emph{bash}, which is the glue language. The OS provides us with IPC (Inter-Process Communication) channels realized as FIFO pipes and stdin/stdout redirections.
 
 The other tools need to be installed manually.
 
 \section{Installing The Tools}
-The tools are all installed using \emph{apt} - the builtin package manager for this distribution.
+The tools are all installed using \emph{apt} - the built-in package manager for this distribution.
 
 \begin{verbatim}
 # apt-get install libav-tools  # For avconv
@@ -118,7 +118,7 @@ I utilized \begin{verbatim} https://youtu.be/RSncu1io0VA [Demo Lecture: Navier-S
 First I copied the matlab code into Fortran. Because I did not find any \emph{interp1} function, I had to code that myself. The drawing code from Matlab was ignored in Fortran.
 
 The boundary conditions had to be implemented. Using the knowledge gained from the demo lecture, one can see that parallel flow along a line requires an equal flow in the opposite direction on the other side of the boundary. For perpendicular flow, the flow variable is simply set to zero. In addition to the boundary conditions, flow from the sides must be created. A flow on the left side of value $0.1$, in addition to the right side are added to the code.
-Using values larger than $0.1$ sometimes gave NaN values, depending on the Reynolds number. An upper limit is reached aroung $0.5$. I decided to keep it at $0.1$ to give the algorithm some flexibility. Higher values can cause NaN to pop up (especially with tight boundary conditions). After some consideration I made this value an input.
+Using values larger than $0.1$ sometimes gave NaN values, depending on the Reynolds number. An upper limit is reached around $0.5$. I decided to keep it at $0.1$ to give the algorithm some flexibility. Higher values can cause NaN to pop up (especially with tight boundary conditions). After some consideration I made this value an input.
 
 \begin{verbatim}
 syscmd(`./getcode.sh main.f 154 175')
@@ -150,7 +150,7 @@ Similar annotations are implemented for pressures and streams. These have no ang
 # END PRESSURE FIELD
 \end{verbatim}
 
-Here the first two values are the coordinate, whereas the last value denotes the pressure relative to other pressures in that timeframe. Again, the highest pressure is a 1, whilst the lowest is 0. The reason for doing this is that it allows the drawings to come out cleanly without spurious numbers. Frame-dependent maxima and minima, as well as the current time are provided in each frame. This allows each picture to be stamped with useful values. The max and min values can be used against the color code of a specific point on the graph to linearly interpolate the true value pressure of that point. Streams have the same representation as the pressure field.
+Here the first two values are the coordinate, whereas the last value denotes the pressure relative to other pressures in that time frame. Again, the highest pressure is a 1, whilst the lowest is 0. The reason for doing this is that it allows the drawings to come out cleanly without spurious numbers. Frame-dependent maxima and minima, as well as the current time are provided in each frame. This allows each picture to be stamped with useful values. The max and min values can be used against the color code of a specific point on the graph to linearly interpolate the true value pressure of that point. Streams have the same representation as the pressure field.
 
 \section{Awk: Processing Data}
 \emph{Awk} is chosen for processing the data since the data is tabular. Awk is also battle-tested by the industry as well as being efficient.
@@ -205,7 +205,7 @@ The pressure and velocity field were easier to draw.
 The 'makefile' translates the 'main.f' using 'sed' into a 'main2.f' file. The reasons for doing this is to avoid the warning of using tabs as indentation. Fortran does not like tabs for indenting because it gives warnings. This solves that problem. It is not an idiomatic solution. I could also change my editor's indents to be spaces, but this would incur a loss of consistency among all pieces of code where tabs are used. No issues or were found that would collide with Fortran's lexer when removing leading tabs.
 
 \section{Space Usage}
-Each stage stores some intermediate data on the disk. Most of the data is located in the 'output' file. This file ranges from 20-400 MB in size. The image files are around 80 KB. The pictures (png) files are often around 100 KB. The final video tends to be around 5-30 MB. This video can be compressed to webm, decreasing its size to 2 MB. The awked files (streams, pressures, velocities) are approximately 50 MB.
+Each stage stores some intermediate data on the disk. Most of the data is located in the 'output' file. This file ranges from 20-400 MB in size. The image files are around 80 KB. The pictures (png) files are often around 100 KB. The final video tends to be around 5-30 MB. This video can be compressed to webm, decreasing its size to 2 MB. The awk'd files (streams, pressures, velocities) are approximately 50 MB.
 
 \begin{verbatim}
 184M	output
@@ -230,7 +230,7 @@ My prior coding knowledge made the project easy to conceptualize and manage. I d
 I eventually got code duplication in the 'tovideo.sh' and 'generate\textunderscore plots.sh' files for each plot (velocity, pressure, stream), that the code was refactored into a single file. Refactoring also occurred in the Fortran code. Querying functions were created to avoid repetitive writing. I started out thinking they should be in functions, but I've learned that one should let the code specialize at first, and only later collect patterns in functions. I tried over-generalizing functions, but that just becomes very difficult to work with.
 
 \section{Results}
-The values printed by the algorithm can be compared to the matlab code. The speeds match the matlab code. I've chosen to use 'REAL(8)' because matlab defaults to double precision floating point numbers. The results can be viewed by opening the respective '*.mov' files in the folders 'streams', 'velocities', and 'pressures'. This file is encoded in the h264 video format. 'vlc' is able to play this format. One can adjust the Reynolds numbers and observe local vortices being creates. A large Reynolds number will show completely turbulent flow. This is in agreement with the general idea of how flow behind a solid body is shaped due to Reynolds numbers.
+The values printed by the algorithm can be compared to the matlab code. The speeds match the matlab code. I've chosen to use 'REAL(8)' because matlab defaults to double precision floating point numbers. The results can be viewed by opening the respective '*.mov' files in the folders 'streams', 'velocities', and 'pressures'. This file is encoded in the h264 video format. 'vlc' is able to play this format. One can adjust the Reynolds numbers and observe local vortices being created. A large Reynolds number will show completely turbulent flow. This is in agreement with the general idea of how flow behind a solid body is shaped due to Reynolds numbers.
 
 To run the code:
 \begin{verbatim} ./everything n Re dt tmax skip boundaries $boundaries \end{verbatim}, where the variables need to be numbers. $n$ is the grid size. $Re$ the Reynolds number. $dt$ the time step. $tmax$ the end time. If you anticipate a warning, you can write 'y' for skip, this will skip the warning if the time step is above the ideal time step. $boundaries$ are the number of boxes. $\$boundaries$ are the actual boxes given as x0 y0 x1 y1 (line-separated). The solver can also be run manually by writing './nstokes', but this will not run the scripts that generate the videos. To generate the videos, you need to pipe the nstokes output into the 'output' file: './nstokes > output'.
@@ -248,8 +248,9 @@ tmax = 10
 box = 12,20,12,20 (x0,x1,y0,y1)
 \end{verbatim}
 
+Running './everything' will compute the differences and put them in temp/differences. It can readily be observed that the absolute and relative errors are around four to six negative orders of magnitude. I suspect these errors to be due to the imperfect ending time in fortran (going to $10.009999$...), whereas matlab reports a time of exactly $10$.
+
 \chapter{Code}
 syscmd(`./createlisting.sh')
 
 \end{document}
-
