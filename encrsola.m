@@ -7,7 +7,7 @@ n=30;
 epsi=1e-6;
 nn=[0   5	10   20   30   40   60   100  500];
 oo=[1.7 1.78 1.86 1.92 1.95 1.96 1.97 1.98 1.99];
-omega=interp1(nn,oo,n);			   % Interpolating a reasonable value
+omega=interp1(nn,oo,n);  % Interpolating a reasonable value
 Re=30000;
 tmax=10;
 dt=0.01;
@@ -21,8 +21,14 @@ if dt>min([h,Re*h^2/4,2/Re])
 	pause
 end
 
-for t=0:dt:tmax				% Main loop
-	for i=2:n+1				% CalVel, calculation of velocities
+bottom = int64((n+2)/4 + (n+2)/8);
+height = int64((n+2)/4);
+top = bottom + height;
+left = bottom;
+right = top;
+
+for t=0:dt:tmax  % Main loop
+	for i=2:n+1  % CalVel, calculation of velocities
 		for j=2:n+1
 			fux=((u(i,j)+u(i+1,j))^2-(u(i-1,j)+u(i,j))^2)*0.25/h;
 			fuy=((v(i,j)+v(i+1,j))*(u(i,j)+u(i,j+1))-(v(i,j-1)+v(i+1,j-1))*(u(i,j-1)+u(i,j)))*0.25/h;
@@ -34,7 +40,7 @@ for t=0:dt:tmax				% Main loop
 			v(i,j)=v(i,j)+dt*((p(i,j)-p(i,j+1))/h-fvx-fvy+visv);
 		end
 	end
-	for iter=1:itmax		   % BcVel, Boundary conditions for the velocities
+	for iter=1:itmax  % BcVel, Boundary conditions for the velocities
 		for j=1:n+2
 			u(1,j)=0.0+0.1;
 			v(1,j)=-v(2,j);
@@ -48,25 +54,20 @@ for t=0:dt:tmax				% Main loop
 			u(i,1)=-u(i,2);
 		end
 
-				bottom = int64((n+2)/4 + (n+2)/8);
-				height = int64((n+2)/4);
-				top = bottom + height;
-				left = bottom;
-				right = top;
-				for j=bottom:top
-					u(left,j)=0.0;
-					v(left,j)=-v(left+1,j);
-					u(right,j)=0.0;
-					v(right+1,j)=-v(right,j);
-				end
-				for i=left:right
-					v(i,top)=0.0;
-					v(i,bottom)=0.0;
-					u(i,top+1)=-u(i,top);
-					u(i,bottom)=-u(i,bottom+1);
-				end
+		for j=bottom:top
+			u(left,j)=0.0;
+			v(left,j)=-v(left+1,j);
+			u(right,j)=0.0;
+			v(right+1,j)=-v(right,j);
+		end
+		for i=left:right
+			v(i,top)=0.0;
+			v(i,bottom)=0.0;
+			u(i,top+1)=-u(i,top);
+			u(i,bottom)=-u(i,bottom+1);
+		end
 
-		iflag=0;			   % Piter, Pressure iterations
+		iflag=0;  % Piter, Pressure iterations
 		for j=2:n+1
 			for i=2:n+1
 				div=(u(i,j)-u(i-1,j))/h+(v(i,j)-v(i,j-1))/h;
@@ -84,9 +85,9 @@ for t=0:dt:tmax				% Main loop
 		if(iflag==0)break,end
 	end
 	if iter>=itmax
-	   disp(['Warning! Time t= ',num2str(t),' iter= ',int2str(iter),' div= ',num2str(div)])
+	   disp(['# Warning! Time t= ',num2str(t),' iter= ',int2str(iter),' div= ',num2str(div)])
 	else
-		disp(['Time t= ',num2str(t),' iter= ',int2str(iter)])
+		disp(['# Time t= ',num2str(t),' iter= ',int2str(iter)])
 	end
 
 end
@@ -126,4 +127,3 @@ psi=-psi';
 [C,H]=contour(psi);
 clabel(C)
 title(['Streamfunction \psi_{max}=',num2str(max(max(abs(psi))))])
-
