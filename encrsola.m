@@ -128,5 +128,5 @@ psi=-psi';
 clabel(C)
 title(['Streamfunction \psi_{max}=',num2str(max(max(abs(psi))))])
 
-dlmwrite('temp/velocities_u', transpose(U));
-dlmwrite('temp/velocities_v', transpose(V));
+dlmwrite('correct/velocities_u', transpose(U));
+dlmwrite('correct/velocities_v', transpose(V));
