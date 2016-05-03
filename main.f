@@ -783,6 +783,7 @@ contains
 		enddo
 		print *, '# END VELOCITY U'
 
+		! Denne kan ikke splittes til en ny funksjon pga små forskjeller i beregningen
 		print *, '# BEGIN VELOCITY V'
 		print *, '# TIME', t
 		do i = 1, n

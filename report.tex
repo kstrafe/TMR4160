@@ -29,9 +29,9 @@
 
 \chapter{Introduction}
 \section{Preliminaries}
-This report documents the process of creating a CFD solver on the UNIX platform using various tools. The solver is coded in \emph{Fortran 2008}. Graph drawing is the responsibility of \emph{gnuplot}. Video creation is done by \emph{avconv} (formerly \emph{ffmpeg}). The glue language used is \emph{bash 4}, together with \emph{awk}. \emph{make} is used as an extra supplement to make building easy. Online tools used are \emph{sharelatex} and \emph{github}. \emph{Sharelatex} allows one to write latex and compile it online. \emph{github} allows one to put his code online. This particular code base is currently encrypted inside a \emph{tar.gz} such that nobody can access it except the maintainer. \emph{rsync} is used to store backups on a site-local server. \emph{Git} is used for version control. \emph{tar} and \emph{gpg} are used for packaging and encrypting respectively.
+This report documents the process of creating a CFD solver on the UNIX platform using various tools. The solver is coded in \emph{Fortran 2008}. Graph drawing is the responsibility of \emph{gnuplot}. Video creation is done by \emph{avconv} (formerly \emph{ffmpeg}). The glue language used is \emph{bash 4}, together with \emph{awk}. \emph{make} is used as an extra supplement to make building easy. Online tools used are \emph{sharelatex} and \emph{github}. \emph{Sharelatex} allows one to write latex and compile it online, eventually \emph{pdflatex} was put to use. \emph{github} allows one to put his code online. This particular code base is currently encrypted inside a \emph{tar.gz} such that nobody can access it except the maintainer. \emph{rsync} is used to store backups on a site-local server. \emph{Git} is used for version control. \emph{tar} and \emph{gpg} are used for packaging and encrypting respectively.
 
-The structure of the report explores each tool, as well as the development within that tool and other utilities used to solve a scientific task on UNIX.
+The structure of the report explores each tool, as well as the development within that tool and other utilities used to solve a scientific task on the UNIX system.
 
 In preparation of this course I've taken the liberty to enroll in TEP4280, which is the introductory computational fluid dynamics course taught at NTNU. I've also learned a significant amount of bash, awk, and various command line tools commonly found on the GNU operating system. My editor of choice is \emph{vim}. \emph{Emacs} has been experimented with.
 
@@ -103,12 +103,12 @@ The other tools need to be installed manually.
 The tools are all installed using \emph{apt} - the built-in package manager for this distribution.
 
 \begin{verbatim}
-# apt-get install libav-tools  # For avconv
-# apt-get install gfortran-4.8  # For Fortran 2008
-# apt-get install gnuplot  # For gnuplot
-# apt-get install build-essential  # For make
-# apt-get install gawk  # For GNU awk
-# apt-get install git  # For git
+# apt-get install libav-tools \  # For avconv
+    gfortran-4.8 \  # For Fortran 2008
+    gnuplot \  # For gnuplot
+    build-essential \  # For make
+    gawk \  # For GNU awk
+    git  # For git
 \end{verbatim}
 
 \section{Fortran 2008: Navier-Stokes Solving}
@@ -121,7 +121,7 @@ The boundary conditions had to be implemented. Using the knowledge gained from t
 Using values larger than $0.1$ sometimes gave NaN values, depending on the Reynolds number. An upper limit is reached around $0.5$. I decided to keep it at $0.1$ to give the algorithm some flexibility. Higher values can cause NaN to pop up (especially with tight boundary conditions). After some consideration I made this value an input.
 
 \begin{verbatim}
-syscmd(`./getcode.sh main.f 154 175')
+syscmd(`./getcode.sh main.f 159 180')
 \end{verbatim}
 
 We now have all pressures, streams, and velocities at each time state. The states and positions are normalized into a $[0, 1]$ range and printed line-by-line to a the standard output. Pressures, streams, and velocities are bulk printed, and each bulk is headed by a header that denotes what the data means.
@@ -170,11 +170,15 @@ Awk is also used to retrieve the \emph{MAX VALUE}, \emph{MIN VALUE}, and \emph{T
 syscmd(`./getcode.sh get_max.awk')
 \end{verbatim}
 
+\noindent Version 4.0.1 is used.
+
 
 \section{GnuPlot: Drawing Images}
 $GnuPlot$ is invoked for each 'number.image' file, which generates a corresponding 'number.png' file. Plotting is run in parallel as to speed it up. Bash is used to put all variables in place for gnuplot to use. It extracts - via awk - the time, Reynolds number, time step, ideal time step, the ending time, the maximal and minimal values, and the mesh size. In addition to this, bash is used to iterate the frames. It also gives gnuplot the correct frame number. Gnuplot draws the image to the given frame number and appends a '.png' extension. After drawing is done, all images get the same filename length by prepending eight numbers, padded by zeros. Each picture is 2000x2000 pixels.
 
 The plotting script is unique to what is being plotted. The vectors are plotted in a different manner compared to the pressure and stream plots. Plots are given a zero-to-one grid such that video frames line up.
+
+\noindent Version 4.6.4 is used.
 
 \section{AvConv: Generating Video}
 A single avconv command reads each png file and turns it into a video file. The video can now be displayed using any compatible media player (h264 encoded video). Threading is added for faster processing. The avconv command outputs a '.mov' file. This is a large file because it retains the high quality of the pictures. Compressing to '.webm' format can easily take the size lower than 3 MB, but the quality suffers.
@@ -184,9 +188,11 @@ syscmd(`./getcode.sh tovideo.sh 2 3')
 \end{verbatim}
 
 A thread count of $4$ was chosen because this process runs three times in parallel (for each of the three plots). This means that a total of twelve threads are spawned. A rule for $n$ cores is to optimally use $\frac{3}{2} n$ threads due to time slicing and context switching. This rule is not empirically verified nor any scientific guideline.
+\noindent Version 9.18-6:9 is used.
 
 \section{Make}
 A simple makefile is used to preprocess the Fortran file. It removes leading tabs and replaces them with spaces.
+\noindent Version 3.81 is used.
 
 \begin{verbatim}
 syscmd(`./getcode.sh makefile')
@@ -194,11 +200,21 @@ syscmd(`./getcode.sh makefile')
 
 \section{Bash: The Glue}
 A single bash file runs every single task. This bash file is called after make finishes compiling. It runs the 'nstokes' file using predetermined input and generates all videos, finally showing them to the viewer in 'vlc' media player.
+Bash version 4.3.11(1)-release is used.
+
+\subsection{m4}
+m4 is used in this report to automatically generate and insert code. It is also used to call scipts, the output of which is included.
+
+\section{Size}
+Overall the size of the entire project can be summed up by cloc (version 1.60)
+\begin{verbatim}
+syscmd(`cloc . | awk "BEGIN{p=0}/-/{p=1}//{if(p==1)print}"')
+\end{verbatim}
 
 \chapter{Discussion}
 Sometimes the Fortran code would diverge slightly when given wrong inputs. Values of 'NaN' are both occurring in the matlab as well as the Fortran script. I suspect this to be the result of an indeterminate form calculation, especially where an infinity is multiplied by a zero. This can come about due to an instability in the numerical method, which the script warns us about.
 
-I was unable to repeat the drawing of the stream function. This requires one to follow the closest points to an established stream line. Due to the nature of iteration over the field, this would be a difficult task which I don't know the algorithm for.
+I was unable to repeat the drawing of the stream function. This requires one to follow the closest points to an established stream line. Due to the nature of iteration over the field, this would be a difficult task which I don't know the algorithm for. I ended up drawing the values at each point instead.
 
 The pressure and velocity field were easier to draw.
 
@@ -251,7 +267,7 @@ box = 12,20,12,20 (x0,x1,y0,y1)
 Running './everything' will compute the differences and put them in temp/differences. It can readily be observed that the absolute and relative errors are around four to six negative orders of magnitude. I suspect these errors to be due to the imperfect ending time in fortran (going to $10.009999$...), whereas matlab reports a time of exactly $10$. Comparing the images shows a clear similarity and direction of the vectors.
 
 \begin{center}
-\includegraphics[width=7in]{velocities/00001001.png}
+\includegraphics[width=7in]{fortran_final.png}
 \end{center}
 \begin{center}
 \includegraphics[width=7in]{matlab_final.png}
