@@ -121,7 +121,7 @@ The boundary conditions had to be implemented. Using the knowledge gained from t
 Using values larger than $0.1$ sometimes gave NaN values, depending on the Reynolds number. An upper limit is reached around $0.5$. I decided to keep it at $0.1$ to give the algorithm some flexibility. Higher values can cause NaN to pop up (especially with tight boundary conditions). After some consideration I made this value an input.
 
 \begin{verbatim}
-syscmd(`./getcode.sh main.f 159 180')
+syscmd(`./getcode.sh main.f 160 181')
 \end{verbatim}
 
 We now have all pressures, streams, and velocities at each time state. The states and positions are normalized into a $[0, 1]$ range and printed line-by-line to a the standard output. Pressures, streams, and velocities are bulk printed, and each bulk is headed by a header that denotes what the data means.
@@ -251,6 +251,8 @@ The values printed by the algorithm can be compared to the matlab code. The spee
 To run the code:
 \begin{verbatim} ./everything flow n Re dt tmax skip boundaries $boundaries \end{verbatim}, where the variables need to be numbers. $flow$ is the flow speed through the channel. $n$ is the grid size. $Re$ the Reynolds number. $dt$ the time step. $tmax$ the end time. If you anticipate a warning, you can write 'y' for skip, this will skip the warning if the time step is above the ideal time step. $boundaries$ are the number of boxes. $\$boundaries$ are the actual boxes given as x0 y0 x1 y1 (line-separated). The solver can also be run manually by writing './nstokes', but this will not run the scripts that generate the videos. To generate the videos, you need to pipe the nstokes output into the 'output' file: './nstokes \textgreater output'.
 \begin{verbatim} ./everything flow n Re dt tmax skip boundaries $boundaries \end{verbatim} stores the given values in the file 'input'. If 'everything' is run without any input, then it defaults to the last input given.
+Another way of running the entire toolchain is by giving one argument. This argument is the path to the input file. \begin{verbatim} ./everything inputs/plate \end{verbatim}
+Another way of running the toolchain for every single input file is to run './run\textunderscore on\textunderscore all\textunderscore inputs.sh'
 
 \subsection{Correctness}
 To show that the results are correct, the matlab script is taken to be the reference implementation of the code. I've taken the liberty to tweak the matlab script to only include the boundary conditions. The values that both tests run under:

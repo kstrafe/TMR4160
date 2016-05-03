@@ -14,6 +14,7 @@ set palette rgbformulae 33,13,10
 
 # Legg inn alle verdier til det nåværende bildet
 set label "dt: ".dt at graph 0.2,0.98 center font "Verdana,24"
+set label "flow: ".flow at graph 0.2,0.95 center font "Verdana,24"
 set label "Max Stream: ".max_val at graph 0.5,0.98 center font "Verdana,24"
 set label "Min Stream: ".min_val at graph 0.5,0.95 center font "Verdana,24"
 set label "Frame: ".filename at graph 0.5,0.05 center font "Verdana,24"

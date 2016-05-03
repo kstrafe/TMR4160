@@ -7,6 +7,7 @@ run:
 	./nstokes
 
 doc:
+	./cleanup.sh
 	m4 report.tex > report.1.tex
 	pdflatex report.1.tex
 	evince report.1.pdf

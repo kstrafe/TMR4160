@@ -118,6 +118,7 @@ program navier
 	print *, '# tmax', tmax
 	print *, '# n', n
 	print *, '# ideal dt', ideal
+	print *, '# flow', flow
 
 	t = 0.0
 	do while (t <= tmax)

@@ -27,6 +27,7 @@ plot() {
 		-e "dt='"$dt"'" \
 		-e "n='"$n"'" \
 		-e "tmax='"$tmax"'" \
+		-e "flow='"$flow"'" \
 		$1
 	mv $frame.png $(printf %08d $frame).png
 }

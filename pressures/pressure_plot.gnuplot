@@ -12,6 +12,7 @@ set palette rgbformulae 33,13,10
 
 # Skriv verdiene til plottet
 set label "dt: ".dt at graph 0.2,0.98 center font "Verdana,24"
+set label "flow: ".flow at graph 0.2,0.95 center font "Verdana,24"
 set label "Max Pressure: ".max_val at graph 0.5,0.98 center font "Verdana,24"
 set label "Min Pressure: ".min_val at graph 0.5,0.95 center font "Verdana,24"
 set label "Frame: ".filename at graph 0.5,0.05 center font "Verdana,24"
