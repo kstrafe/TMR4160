@@ -19,4 +19,3 @@ for extension in sh f m awk gnuplot; do
 	$((++language_iter))
 done
 interpolate makefile bash "makefile"
-interpolate temp/differences

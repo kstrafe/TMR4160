@@ -26,7 +26,7 @@ function computeDifferences {
 	length=${#matlab_speeds[@]}
 	while [ "$iterator" -lt "$length" ]; do
 		fortran=${fortran_speeds[$iterator]}
-		fortran=$(echo $fortran | awk -F'E' '{ printf "%s*10^(%s)", $1, $2; }')
+		fortran=$(echo $fortran | awk -F'E' '{ if (NF == 2) printf "%s*10^(%s)", $1, $2; else print; }')
 		matlab=${matlab_speeds[$iterator]}
 		matlab=$(echo $matlab | awk -F'e' '{ if (NF==2) printf "%s*10^(%s)", $1, $2; else print; }')
 		fortran=$(replacePlus $fortran)
