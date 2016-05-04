@@ -283,6 +283,10 @@ My prior coding knowledge made the project easy to conceptualize and manage. I d
 \section{Refactoring}
 I eventually got code duplication in the 'tovideo.sh' and 'generate\textunderscore plots.sh' files for each plot (velocity, pressure, stream), that the code was refactored into a single file. Refactoring also occurred in the Fortran code. Querying functions were created to avoid repetitive writing. I started out thinking they should be in functions, but I've learned that one should let the code specialize at first, and only later collect patterns in functions. I tried over-generalizing functions, but that just becomes very difficult to work with.
 
+\section{Future Improvements}
+The project could be improved by using different types of input files. Instead of raw input, a flag to the program with an \emph{xml}, \emph{json}, or \emph{toml} file could be specified. These configurations are easier to read and write.
+Another improvement could be to have these settings easily accessible throughout the bash scripts. Currently, the scripts make a lot of assumptions on the previous parts of the toolchain. Changing a setting may cause a cascading error. Another improvement would be to run the scripts with a \emph{set -e} setting, causing the scripts to abort upon the first error encountered. The fortran code could be split over multiple files. The awk scripts for getting a variable from \emph{output} could be gathered into one file and instead be executed using an extra parameter.
+
 \section{Imagery}
 The final images and videos closely resemble the matlab result. They show varying degrees of turbulence and laminar flow.
 Here are some renderings of various images.
