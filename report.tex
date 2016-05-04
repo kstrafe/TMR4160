@@ -233,7 +233,7 @@ Each stage stores some intermediate data on the disk. Most of the data is locate
 The large size of 'velocities' is due to the relative incompressibility of the arrows in the images. This makes the images around ten times as large as the ones in pressures and streams. The same is true of the video file.
 
 \section{Processing Time}
-On my Intel i7-3630QM machine, utilizing all cores for image generation in gnuplot takes the most time. About a full second per image, depending on data points and resolution. Running the awk scripts takes negligible amounts of time. The solver itself can consume a large amount of time if the data points are above 50 and the time intervals lower than $10^3$. The fortran compiler is remarkably fast, finishing within a second. Future revisions of the Navier-Stokes solver could use parallelization in addition to an adaptive K-d Tree for a variable-sized mesh.
+On my Intel i7-3630QM machine, utilizing all cores for image generation in gnuplot takes the most time. About a full second per image, depending on data points and resolution. Running the awk scripts takes negligible amounts of time. The solver itself can consume a large amount of time if the data points are above 50 and the time intervals lower than $10^{-3}$. The fortran compiler is remarkably fast, finishing within a second. Future revisions of the Navier-Stokes solver could use parallelization in addition to an adaptive K-d Tree for a variable-sized mesh.
 \begin{verbatim}
 real 4m27.598s
 \end{verbatim} is the running time for the entire toolchain using standard input values.
@@ -284,7 +284,7 @@ My prior coding knowledge made the project easy to conceptualize and manage. I d
 I eventually got code duplication in the 'tovideo.sh' and 'generate\textunderscore plots.sh' files for each plot (velocity, pressure, stream), that the code was refactored into a single file. Refactoring also occurred in the Fortran code. Querying functions were created to avoid repetitive writing. I started out thinking they should be in functions, but I've learned that one should let the code specialize at first, and only later collect patterns in functions. I tried over-generalizing functions, but that just becomes very difficult to work with.
 
 \section{Future Improvements}
-The project could be improved by using different types of input files. Instead of raw input, a flag to the program with an \emph{xml}, \emph{json}, or \emph{toml} file could be specified. These configurations are easier to read and write.
+The project could be improved by using different types of input files. Instead of raw input, a flag to the program with an \emph{xml}, \emph{json}, or \emph{toml} file could be specified. These configurations are easier to read and write. I'd like to try using \emph{acon} (Awk-Compatible Object Notation), which is a hobby project of mine.
 Another improvement could be to have these settings easily accessible throughout the bash scripts. Currently, the scripts make a lot of assumptions on the previous parts of the toolchain. Changing a setting may cause a cascading error. Another improvement would be to run the scripts with a \emph{set -e} setting, causing the scripts to abort upon the first error encountered. The fortran code could be split over multiple files. The awk scripts for getting a variable from \emph{output} could be gathered into one file and instead be executed using an extra parameter.
 
 \section{Imagery}
