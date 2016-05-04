@@ -15,7 +15,7 @@ function moveLastImage {
 	mv "$last" generated/"${2#inputs/}"_"$1".png
 }
 
-for input in inputs/*; do
+for input in $@; do
 	./everything_no_vlc.sh "$input"
 	move velocities "$input"
 	move pressures "$input"

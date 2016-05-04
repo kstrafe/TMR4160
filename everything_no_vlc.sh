@@ -84,5 +84,5 @@ cd ..
 # matlab bare ble kjørt med 12-20-12-20 boksen. Vi har ikke annet å sammenligne med
 echo Computing differences with conventional 12-20-12-20 matlab answer
 ./matrix_to_image.awk output
-./compare > temp/differences
+./compare.sh > temp/differences
 

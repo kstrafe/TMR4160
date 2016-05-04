@@ -5,6 +5,6 @@
 for i in generated/*.png; do
 	echo '\begin{center}'
 	echo '\includegraphics[width=7in]{'${i}'}'
-	echo "$i"
+	echo "$i" | sed 's/_/\\textunderscore /g'
 	echo '\end{center}'
 done

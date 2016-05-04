@@ -238,12 +238,6 @@ On my Intel i7-3630QM machine, utilizing all cores for image generation in gnupl
 real 4m27.598s
 \end{verbatim} is the running time for the entire toolchain using standard input values.
 
-\chapter{Conclusion}
-\section{Overall Experience}
-My prior coding knowledge made the project easy to conceptualize and manage. I did have to learn Fortran and gnuplot. These tools I've never used before. Most time of the project time was spent learning Fortran and gnuplot. The bash and awk scripts were easy to put together. The architecture of the project did not require much thought, as the separation of concerns was so high that there was no need for object oriented programming or multi-file fortran code.
-
-\section{Refactoring}
-I eventually got code duplication in the 'tovideo.sh' and 'generate\textunderscore plots.sh' files for each plot (velocity, pressure, stream), that the code was refactored into a single file. Refactoring also occurred in the Fortran code. Querying functions were created to avoid repetitive writing. I started out thinking they should be in functions, but I've learned that one should let the code specialize at first, and only later collect patterns in functions. I tried over-generalizing functions, but that just becomes very difficult to work with.
 
 \section{Results}
 The values printed by the algorithm can be compared to the matlab code. The speeds match the matlab code. I've chosen to use 'REAL(8)' because matlab defaults to double precision floating point numbers. The results can be viewed by opening the respective '*.mov' files in the folders 'streams', 'velocities', and 'pressures'. This file is encoded in the h264 video format. 'vlc' is able to play this format. One can adjust the Reynolds numbers and observe local vortices being created. A large Reynolds number will show completely turbulent flow. This is in agreement with the general idea of how flow behind a solid body is shaped due to Reynolds numbers.
@@ -252,7 +246,7 @@ To run the code:
 \begin{verbatim} ./everything flow n Re dt tmax skip boundaries $boundaries \end{verbatim}, where the variables need to be numbers. $flow$ is the flow speed through the channel. $n$ is the grid size. $Re$ the Reynolds number. $dt$ the time step. $tmax$ the end time. If you anticipate a warning, you can write 'y' for skip, this will skip the warning if the time step is above the ideal time step. $boundaries$ are the number of boxes. $\$boundaries$ are the actual boxes given as x0 y0 x1 y1 (line-separated). The solver can also be run manually by writing './nstokes', but this will not run the scripts that generate the videos. To generate the videos, you need to pipe the nstokes output into the 'output' file: './nstokes \textgreater output'.
 \begin{verbatim} ./everything flow n Re dt tmax skip boundaries $boundaries \end{verbatim} stores the given values in the file 'input'. If 'everything' is run without any input, then it defaults to the last input given.
 Another way of running the entire toolchain is by giving one argument. This argument is the path to the input file. \begin{verbatim} ./everything inputs/plate \end{verbatim}
-Another way of running the toolchain for every single input file is to run './run\textunderscore on\textunderscore all\textunderscore inputs.sh'
+Another way of running the toolchain for every single input file is to run './run\textunderscore on\textunderscore all\textunderscore inputs.sh inputs/*'. This program can also take any single file as its input. It will copy the last image and videos to the generated folder.
 
 \subsection{Correctness}
 To show that the results are correct, the matlab script is taken to be the reference implementation of the code. I've taken the liberty to tweak the matlab script to only include the boundary conditions. The values that both tests run under:
@@ -279,7 +273,19 @@ The region of interest in these two graphs is in the middle, to the right. We ca
 
 The further investigation of deviations in a statistical analysis is beyond the scope of this report.
 
-Here are some renderings of various objects.
+All generated images filed under conclusion.
+
+
+\chapter{Conclusion}
+\section{Overall Experience}
+My prior coding knowledge made the project easy to conceptualize and manage. I did have to learn Fortran and gnuplot. These tools I've never used before. Most time of the project time was spent learning Fortran and gnuplot. The bash and awk scripts were easy to put together. The architecture of the project did not require much thought, as the separation of concerns was so high that there was no need for object oriented programming or multi-file fortran code.
+
+\section{Refactoring}
+I eventually got code duplication in the 'tovideo.sh' and 'generate\textunderscore plots.sh' files for each plot (velocity, pressure, stream), that the code was refactored into a single file. Refactoring also occurred in the Fortran code. Querying functions were created to avoid repetitive writing. I started out thinking they should be in functions, but I've learned that one should let the code specialize at first, and only later collect patterns in functions. I tried over-generalizing functions, but that just becomes very difficult to work with.
+
+\section{Imagery}
+The final images and videos closely resemble the matlab result. They show varying degrees of turbulence and laminar flow.
+Here are some renderings of various images.
 
 syscmd(`./creategraphic.sh')
 

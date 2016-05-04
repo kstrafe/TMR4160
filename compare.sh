@@ -26,8 +26,9 @@ function computeDifferences {
 
 	iterator=0
 	length=${#matlab_speeds[@]}
+	other_length=${#fortran_speeds[@]}
 	awkscript='{ if (NF == 2) printf "%s*10^(%s)", $1, $2; else print; }'
-	while [ "$iterator" -lt "$length" ]; do
+	while [ "$iterator" -lt "$length" ] && [ "$iterator" -lt "$other_length" ]; do
 		fortran=${fortran_speeds[$iterator]}
 
 		# Fjern vitenskaplig notasjon fra elementet (bc klarer ikke å parse det)
