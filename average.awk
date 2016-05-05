@@ -1,5 +1,7 @@
 #! /usr/bin/awk -f
 
+# Beregn gjennomsnittsverdien på feil
+
 function abs(value) { return value > 0 ? value : -value; }
 BEGIN { abs_avg = 0; abs_hit = 0; rel_avg = 0; rel_hit = 0; }
 /Absolute Error/ { abs_avg += abs($4); ++abs_hit; }
