@@ -28,9 +28,6 @@ if ! [ -d temp ]; then
 	mkdir temp
 fi
 
-# Drep alle barn dersom dette skriptet får sigint eller lignende
-# trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
-
 # Forsikre at den nyeste versjonen er laget
 make
 
@@ -83,6 +80,9 @@ cd ..
 # Det blir store avvik dersom vi ikke bruker 12-20-12-20 boksen, det er fordi
 # matlab bare ble kjørt med 12-20-12-20 boksen. Vi har ikke annet å sammenligne med
 echo Computing differences with conventional 12-20-12-20 matlab answer
+echo Note: these are very much not meaningful when not comparing standard
 ./matrix_to_image.awk output
 ./compare.sh > temp/differences
-
+./average.awk temp/differences > temp/avg_differences
+cat temp/avg_differences
+cp temp/avg_differences generated/avg_differences

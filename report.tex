@@ -260,8 +260,11 @@ tmax = 10
 box = 12,20,12,20 (x0,x1,y0,y1)
 \end{verbatim}
 
-Running './everything' will compute the differences and put them in temp/differences. It can readily be observed that the absolute and relative errors are around four to six negative orders of magnitude. I suspect these errors to be due to the imperfect ending time in fortran (going to $10.009999$...), whereas matlab reports a time of exactly $10$. Comparing the images shows a clear similarity and direction of the vectors.
+Running './everything' will compute the differences and put them in 'temp/differences'. These will then be averaged and put into 'temp/avg\textunderscore differences'. It can readily be observed that the absolute and relative errors are around four to six negative orders of magnitude. I suspect these errors to be due to the imperfect ending time in fortran (going to $10.009999$...), whereas matlab reports a time of exactly $10$. Comparing the images shows a clear similarity and direction of the vectors.
 
+\begin{verbatim}
+syscmd(`cat generated/avg_differences')
+\end{verbatim}
 \begin{center}
 \includegraphics[width=7in]{fortran_final.png}
 \end{center}
@@ -285,7 +288,7 @@ I eventually got code duplication in the 'tovideo.sh' and 'generate\textundersco
 
 \section{Future Improvements}
 The project could be improved by using different types of input files. Instead of raw input, a flag to the program with an \emph{xml}, \emph{json}, or \emph{toml} file could be specified. These configurations are easier to read and write. I'd like to try using \emph{acon} (Awk-Compatible Object Notation), which is a hobby project of mine.
-Another improvement could be to have these settings easily accessible throughout the bash scripts. Currently, the scripts make a lot of assumptions on the previous parts of the toolchain. Changing a setting may cause a cascading error. Another improvement would be to run the scripts with a \emph{set -e} setting, causing the scripts to abort upon the first error encountered. The fortran code could be split over multiple files. The awk scripts for getting a variable from \emph{output} could be gathered into one file and instead be executed using an extra parameter.
+Another improvement could be to have these settings easily accessible throughout the bash scripts. Currently, the scripts make a lot of assumptions on the previous parts of the toolchain. Changing a setting may cause a cascading error. Another improvement would be to run the scripts with a \emph{set -e} setting, causing the scripts to abort upon the first error encountered. The fortran code could be split over multiple files. The awk scripts for getting a variable from \emph{output} could be gathered into one file and instead be executed using an extra parameter. Cleanup scripting should be considered more carefully. Finally, the boundary conditions could be improved to allow arbitrary non-block conditions (like circles and other smooth curves).
 
 \section{Imagery}
 The final images and videos closely resemble the matlab result. They show varying degrees of turbulence and laminar flow.
