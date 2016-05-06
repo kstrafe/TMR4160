@@ -7,7 +7,7 @@ run:
 	./nstokes
 
 doc:
-	./cleanup.sh
+	./clean
 	m4 report.tex > report.1.tex
 	pdflatex report.1.tex
 	pdflatex report.1.tex  # Flere ganger for å bygge opp table of contents
